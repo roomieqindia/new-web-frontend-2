@@ -1,5 +1,5 @@
 import GridCardLike from "../components/CardLike";
-import Category from "../assets/Category.svg";
+import Category from "../assets/category.svg";
 import House from "../assets/House.svg";
 import Filter from "../assets/filter.png";
 import Footer from "../components/footer";

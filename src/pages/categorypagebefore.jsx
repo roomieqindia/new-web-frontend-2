@@ -1,4 +1,4 @@
-import Category from "../assets/Category.svg";
+import Category from "../assets/category.svg";
 import House from "../assets/House.svg";
 import Filter from "../assets/filter.png";
 
