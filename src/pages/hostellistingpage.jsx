@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import vectorIcon from "../assets2/vector.png";
+import vectorIcon from "../assets2/Vector.png";
 import verctrIcon from "../assets2/vectr2.png";
 import newImage from "../assets2/newimage.svg";
 import fitness from "../assets/fitness.svg";

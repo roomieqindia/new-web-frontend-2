@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 import leftImage from "../assets2/Group.png";
 import rightImage from "../assets2/arrowcircleright.png";
 import ellipseImage from "../assets2/ellipse2.png";
-import vectorIcon from "../assets2/vector.png";
+import vectorIcon from "../assets2/Vector.png";
 import verctrIcon from "../assets2/vectr2.png";
 import newImage from "../assets2/newimage.svg";
 import GridCardLike from "./CardLike";
