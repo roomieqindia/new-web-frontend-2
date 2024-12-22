@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react";
-import peela from "../assets/peelabutton.png";
+// import peela from "../assets/peelabutton.png";
 import dabba from "../assets/dabba.png";
-import linepic from "../assets/vector.png";
-import line from "../assets/line.png";
+// import linepic from "../assets/vector.png";
+// import line from "../assets/line.png";
 import left from "../assets2/assets3/left.png";
 import right from "../assets2/assets3/right.png";
 import NavBar from "../components/Navbar";
