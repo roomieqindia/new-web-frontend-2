@@ -2,7 +2,7 @@ import Vector from "../assets/Vector.svg";
 import bot from "../assets/Technical Support.svg";
 import chatic from "../assets/Chat Bubble.svg";
 
-import Chatbot from "../pages/Chatbot";
+import Chatbot from "../pages/ChatBot";
 import { Link } from "react-router-dom";
 
 const SideChat = () => {
