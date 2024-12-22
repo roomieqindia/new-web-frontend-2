@@ -1,7 +1,7 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Signup from "./components/signup";
 import Cat from "./pages/categorypage";
-import Cat1 from "./pages/categorypagebefore";
+// import Cat1 from "./pages/categorypagebefore";
 import Home from "./pages/home";
 import Testing from "./pages/nolistingpage";
 // import Cat2 from "./pages/categorypageafter";
@@ -77,7 +77,7 @@ export default function App() {
         <Route path="/bhojanalayas" element={<BhojnalayasPage />} />
         <Route path="/blogs" element={<BlogPage />} />
         <Route path="/blogs/:id" element={<BlogSubPage />} />
-        <Route path="/cat1" element={<Cat1 />} />
+        {/* <Route path="/cat1" element={<Cat1 />} /> */}
         <Route path="/cat" element={<Cat />} />
         <Route path="/citypage" element={<CityPage />} />
         <Route path="/career" element={<CareerWithUS />} />
