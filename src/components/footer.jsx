@@ -161,11 +161,11 @@ const Footer = () => {
                 Consultation
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link to="/membership" className="hover:text-green-600">
                 Membership Plans
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
 

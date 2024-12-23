@@ -171,7 +171,7 @@ function temphome() {
                 {location && (
                   <span>
                     <span className="font-semibold text-gray-700">
-                      {location}
+                    {location?.split(",").slice(0, 3).join(", ")}
                     </span>
                   </span>
                 )}

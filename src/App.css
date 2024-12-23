@@ -368,3 +368,8 @@
     display: block;
   }
 }
+@media only screen and (max-width: 1000px) {
+  .filter-cnt {
+    display: none;
+  }
+}

@@ -59,7 +59,7 @@ const CouponsRewards = ({ setCoupon }) => {
             </h1>
             <div className="bg-[#E4C1F9] p-3 rounded-[30px]">
               {/* Map through coupons and display them */}
-              {coupons[0] != null ? (
+              {coupons&&coupons[0] != null ? (
                 coupons.slice(0, 2).map((coupon, index) => (
                   <div key={index} className="relative mb-2">
                     <input

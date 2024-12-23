@@ -131,7 +131,7 @@ const OTP1 = () => {
               key={index}
               type="text"
               maxLength="1"
-              className="w-12 h-12 border text-center rounded-md text-xl"
+              className="w-12 h-12 border border-black text-center rounded-md text-xl"
               value={data}
               onChange={(e) => handleChange(e.target, index)}
               onFocus={(e) => e.target.select()}

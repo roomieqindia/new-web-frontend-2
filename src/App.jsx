@@ -50,6 +50,7 @@ import OfficePage from "./pages/officeAll";
 import RoommatesPage from "./pages/roommateAll";
 import RoomsPage from "./pages/roomsAll";
 import Transaction from "./pages/Transaction";
+import Demo from "./pages/Demo";
 
 // import Cards from "./components/cards";
 
@@ -107,6 +108,7 @@ export default function App() {
         <Route path="/termsandconditions" element={<TermsCondition />} />
         <Route path="/transaction" element={<Transaction />} />
         <Route path="/wishlist" element={<WishList />} />
+        <Route path="/demo" element={<Demo />} />
 
         {/* <Route path="/cat2" element={<Cat2 />} /> */}
         {/* <Route path="/otp2" element={<OTP2 />} /> */}

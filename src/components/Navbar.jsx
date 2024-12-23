@@ -334,12 +334,12 @@ const ProfileDropdown = ({
               <li className="border-b pb-2">
                 <Link to="/wishlist">My Wishlist</Link>
               </li>
-              <li className="border-b pb-2">
+              {/* <li className="border-b pb-2">
                 <Link onClick={handlecoupon}>Coupons & Rewards</Link>
               </li>
               <li className="border-b pb-2">
                 <Link>Request Refund</Link>
-              </li>
+              </li> */}
               <li className="border-b pb-2">
                 <Link>Get the APP</Link>
               </li>

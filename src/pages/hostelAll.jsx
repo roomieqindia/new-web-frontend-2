@@ -10,7 +10,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
-
+import PriceRangeSlider from "../components/PriceRangeSlider";
 
 function HostelsPage() {
   const [HostelsList, setHostelsList] = useState([]);
@@ -19,40 +19,85 @@ function HostelsPage() {
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const { userLocation, fetchLocation } = useLocation();
+  const [advanceFilter, setAdvanceFilter] = useState({
+    budget: {
+      min: 0,
+      max: 0,
+    },
+    subType: [],
+    // listed: [],
+
+    sortBy: "",
+  });
+  const handleFilter = async () => {
+    // Filter hostels with advanceFilter
+    const { data } = await axiosI.post("/filter/hostels", advanceFilter);
+    console.log(data);
+    setHostelsList(data);
+  };
+
+  const handleClearFilter = () => {
+    setAdvanceFilter({
+      budget: {
+        min: 0,
+        max: 0,
+      },
+      subType: [],
+      // listed: [],
+
+      sortBy: "",
+    });
+
+    // Fetch hostels with filter and userLocation
+    fetchHostels();
+  };
+
+  const handlePriceRangeChange = (range) => {
+    setAdvanceFilter((prev) => ({
+      ...prev,
+      budget: {
+        min: range[0],
+        max: range[1],
+      },
+    }));
+  };
+
+  const fetchHostels = () => {
+    axiosI
+      .get("/hostels", {
+        params: {
+          filter,
+          lat: userLocation?.lat,
+          lng: userLocation?.lng,
+        },
+      })
+      .then((res) => {
+        setHostelsList(res.data);
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
     fetchLocation();
   }, []);
 
-    useEffect(() => {
-      // Fetch hostels
-      axiosI
-        .get("/hostels", {
-          params: {
-            filter,
-            lat: userLocation?.lat,
-            lng: userLocation?.lng,
-          },
-        })
-        .then((res) => {
-          setHostelsList(res.data);
-          console.log("Hostel List: ", res.data);
-          setLoading(false);
-        });
-    
-      // Fetch wishlist items
-      axiosI.get("/wishlist").then((res) => {
-        setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
-      });
-    }, [filter, userLocation]);
+  useEffect(() => {
+    // Fetch hostels
+    fetchHostels();
+    // Fetch wishlist items
+    axiosI.get("/wishlist").then((res) => {
+      setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
+    });
+  }, [filter, userLocation]);
 
   const toggleWishlist = (id) => {
     console.log("Toggling wishlist for: ", id);
-    
+
     const isWishlisted = wishlist.includes(id);
     console.log("isWishlisted: ", isWishlisted);
-    
+
     axiosI
-      .post("/wishlist/toggle", { itemId: id ,itemType: "Hostel"})
+      .post("/wishlist/toggle", { itemId: id, itemType: "Hostel" })
       .then((res) => {
         if (isWishlisted) {
           setWishlist((prev) => prev.filter((item) => item !== id));
@@ -64,7 +109,6 @@ function HostelsPage() {
         console.error("Error toggling wishlist: ", err);
       });
   };
-
 
   // useEffect(() => {
   //   const filtered = HostelsList.filter((hostel) => {
@@ -80,8 +124,7 @@ function HostelsPage() {
   //   });
   //   setFilteredHostelsList(sorted);
   // }, [filter, HostelsList]);
-  console.log(HostelsList);
-  
+
   return (
     <>
       <Navbar />
@@ -159,9 +202,119 @@ function HostelsPage() {
       ) : (
         <>
           <div className="px-4">
-            <div className="font-poppins py-6">
+            <div className="font-poppins py-6 flex justify-between">
+              <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt">
+                <div className="text-2xl text-center w-full">
+                  FILTERS & SORTING
+                </div>
+                {/* divider */}
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Price Range Slider with Min-Max Input */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Budget</label>
+                  <label className="text-xs mb-4">Choose a range below</label>
+                  <div className="flex items-center space-x-2">
+                    <PriceRangeSlider
+                      min={0}
+                      max={100000}
+                      step={100}
+                      defaultValue={[0, 100000]}
+                      onRangeChange={handlePriceRangeChange}
+                    />
+                  </div>
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+
+                {/* By Furnishing checkbox */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Category</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["Boys", "Girls"].map((e) => (
+                    <div className="p-2 px-4  mb-3" key={e}>
+                      <input
+                        type="checkbox"
+                        onClick={() =>
+                          setAdvanceFilter((prev) => ({
+                            ...prev,
+                            subType: [...prev.subType, e],
+                          }))
+                        }
+                        className="mr-2"
+                      />
+
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* By Listed checkbox */}
+                {/* <div className="flex flex-col space">
+                  <label className="text-lg">Listed By</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["Owner", "Tenant / Rental"].map((e) => (
+                    <div className="p-2 px-4  mb-3" key={e}>
+                      <input
+                        type="checkbox"
+                        onClick={() =>
+                          setAdvanceFilter((prev) => ({
+                            ...prev,
+                            listed: [...prev.listed, e],
+                          }))
+                        }
+                        className="mr-2"
+                      />
+                      {e}
+                    </div>
+                  ))}
+                </div> */}
+
+                {/* Sort By */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">Sort By</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["Price: Low to High", "Price: High to Low"].map((e) => (
+                    <div
+                      className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer
+                    ${
+                      advanceFilter.sortBy === e
+                        ? "bg-[#bedbfe] border-blue-500"
+                        : ""
+                    }`}
+                      onClick={() =>
+                        setAdvanceFilter((prev) => ({ ...prev, sortBy: e }))
+                      }
+                      key={e}
+                    >
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Buttons */}
+                <div className="flex justify-between mt-4">
+                  <button
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
+                    onClick={handleClearFilter}
+                  >
+                    Clear
+                  </button>
+                  <button
+                    // add transition of .5s
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
+                    onClick={handleFilter}
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
               {/* Grid Container */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 w-4/5">
                 {HostelsList.map((hostel, index) => (
                   <div key={index}>
                     <GridCardLike

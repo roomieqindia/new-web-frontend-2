@@ -10,6 +10,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
+import PriceRangeSlider from "../components/PriceRangeSlider";
 
 function BhojnalayasPage() {
   const [BhojnalayasList, setBhojnalayasList] = useState([]);
@@ -18,21 +19,83 @@ function BhojnalayasPage() {
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const { userLocation, fetchLocation } = useLocation();
+  const [advanceFilter, setAdvanceFilter] = useState({
+    monthlyCharge1: {
+      min: 0,
+      max: 0,
+    },
+    monthlyCharge2: {
+      min: 0,
+      max: 0,
+    },
+    parcelOfFood: "",
+    veg: "",
+  });
+  const handleFilter = async () => {
+    // Filter rooms with advanceFilter
+    const { data } = await axiosI.post("/filter/bhojnalaya", advanceFilter);
+    setBhojnalayasList(data);
+    console.log(data);
+  };
+
+  const handleClearFilter = () => {
+    setAdvanceFilter({
+      monthlyCharge1: {
+        min: 0,
+        max: 0,
+      },
+      monthlyCharge2: {
+        min: 0,
+        max: 0,
+      },
+      parcelOfFood: "",
+      veg: "",
+    });
+
+    // Fetch rooms with filter and userLocation
+    fetchBhojnalayas();
+  };
+
+  const handleMonthlyCharge1Change = (range) => {
+    setAdvanceFilter((prev) => ({
+      ...prev,
+      monthlyCharge1: {
+        min: range[0],
+        max: range[1],
+      },
+    }));
+  };
+  const handleMonthlyCharge2Change = (range) => {
+    setAdvanceFilter((prev) => ({
+      ...prev,
+      monthlyCharge1: {
+        min: range[0],
+        max: range[1],
+      },
+    }));
+  };
+
+  const fetchBhojnalayas = () => {
+    axiosI
+      .get("/bhojnalayas", {
+        params: {
+          filter,
+          lat: userLocation?.lat,
+          lng: userLocation?.lng,
+        },
+      })
+      .then((res) => {
+        setBhojnalayasList(res.data);
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
     fetchLocation();
   }, []);
 
   useEffect(() => {
-    axiosI.get("/bhojnalayas",{
-      params: {
-        filter,
-        lat: userLocation?.lat,
-        lng: userLocation?.lng,
-      }
-    }).then((res) => {
-      setBhojnalayasList(res.data);
-      setLoading(false);
-    });
+    fetchBhojnalayas();
     axiosI.get("/wishlist").then((res) => {
       setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
     });
@@ -150,9 +213,112 @@ function BhojnalayasPage() {
       ) : (
         <>
           <div className="px-4">
-            <div className="font-poppins py-6">
+            <div className="font-poppins py-6 flex justify-between">
+              <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt">
+                <div className="text-2xl text-center w-full">
+                  FILTERS & SORTING
+                </div>
+                {/* divider */}
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Price Range Slider with Min-Max Input */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Monthly Charge 1 time</label>
+                  <label className="text-xs mb-4">Choose a range below</label>
+                  <div className="flex items-center space-x-2">
+                    <PriceRangeSlider
+                      min={0}
+                      max={10000}
+                      step={50}
+                      defaultValue={[0, 10000]}
+                      onRangeChange={handleMonthlyCharge1Change}
+                    />
+                  </div>
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Price Range Slider with Min-Max Input */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Monthly Charge 2 time</label>
+                  <label className="text-xs mb-4">Choose a range below</label>
+                  <div className="flex items-center space-x-2">
+                    <PriceRangeSlider
+                      min={0}
+                      max={20000}
+                      step={50}
+                      defaultValue={[0, 20000]}
+                      onRangeChange={handleMonthlyCharge2Change}
+                    />
+                  </div>
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* By parcelOfFood */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Parcel Of Food</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["Delivery", "Takeaway"].map((e) => (
+                    <div
+                      className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
+                        advanceFilter.parcelOfFood === e
+                          ? "bg-[#bedbfe] border-blue-500"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setAdvanceFilter((prev) => ({
+                          ...prev,
+                          parcelOfFood: e,
+                        }))
+                      }
+                      key={e}
+                    >
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* By veg */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Veg/Non-veg</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {/* set active also */}
+                  {["Veg", "Non-veg"].map((e) => (
+                    <div
+                      className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
+                        advanceFilter.veg === e
+                          ? "bg-[#bedbfe] border-blue-500"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setAdvanceFilter((prev) => ({ ...prev, veg: e }))
+                      }
+                      key={e}
+                    >
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Buttons */}
+                <div className="flex justify-between mt-4">
+                  <button
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
+                    onClick={handleClearFilter}
+                  >
+                    Clear
+                  </button>
+                  <button
+                    // add transition of .5s
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
+                    onClick={handleFilter}
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
               {/* Grid Container */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 w-4/5">
                 {BhojnalayasList.map((room, index) => (
                   <div key={index}>
                     <GridCardLike

@@ -222,7 +222,7 @@ function RoomsPage() {
           <div className="px-4">
             <div className="font-poppins py-6 flex justify-between">
               {/* advance Filter */}
-              <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900">
+              <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt">
                 <div className="text-2xl text-center w-full">
                   FILTERS & SORTING
                 </div>
@@ -428,13 +428,14 @@ function RoomsPage() {
                 {/* Buttons */}
                 <div className="flex justify-between mt-4">
                   <button
-                    className="py-2 px-5 rounded-lg border-[.5px] border-black"
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
                     onClick={handleClearFilter}
                   >
                     Clear
                   </button>
                   <button
-                    className="py-2 px-5 rounded-lg border-[.5px] border-black"
+                    // add transition of .5s
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
                     onClick={handleFilter}
                   >
                     Apply
@@ -447,7 +448,7 @@ function RoomsPage() {
                   <div key={index}>
                     <Card
                       title={room.roomName}
-                      desc={room.description}
+                      desc={room.description || "No Description"}
                       img={room.images?.[0]} // Safe navigation for images array
                       price={room.monthlyMaintenance}
                       location={room.location}

@@ -60,9 +60,9 @@
 //             <img onClick={handleHeartClick} src={isWishlisted ? HeartFill : Heart} alt="" className={``} />
 //             <img src="bluetick.svg" alt="" />
 //           </div>
-          
+
 //         </div>
-        
+
 //         <div className="prod_desc">{desc}</div>
 //         <div className="price_city">
 //           <div className="price">₹{price}</div>
@@ -83,10 +83,9 @@
 
 // export default Card;
 
-
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Heart, MessageCircle, CheckCircle,Star } from 'lucide-react';
+import { Heart, MessageCircle, CheckCircle, Star } from "lucide-react";
 
 const Card = ({
   _id,
@@ -129,11 +128,7 @@ const Card = ({
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
       <div className="relative">
-        <img
-          src={img}
-          alt={title}
-          className="w-full h-48 object-cover"
-        />
+        <img src={img} alt={title} className="w-full h-48 object-cover" />
         {isFeatureListing && (
           <div className="absolute top-2 left-2 bg-yellow-400 rounded-full p-1.5 shadow-md">
             <Star className="w-4 h-4 text-white" fill="white" />
@@ -142,27 +137,29 @@ const Card = ({
         <button
           onClick={handleHeartClick}
           className={`absolute top-2 right-2 p-1 rounded-full bg-white bg-opacity-70 transition-transform duration-300 ${
-            animateHeart ? 'scale-125' : ''
+            animateHeart ? "scale-125" : ""
           }`}
         >
           <Heart
             className={`w-5 h-5 ${
-              isWishlisted ? 'text-red-500 fill-current' : 'text-gray-600'
+              isWishlisted ? "text-red-500 fill-current" : "text-gray-600"
             }`}
           />
         </button>
       </div>
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <h2 className="text-lg font-semibold text-gray-800 truncate">{title}</h2>
-          {verified && (
-            <CheckCircle className="w-5 h-5 text-blue-500" />
-          )}
+          <h2 className="text-lg font-semibold text-gray-800 truncate">
+            {title}
+          </h2>
+          {verified && <CheckCircle className="w-5 h-5 text-blue-500" />}
         </div>
         <p className="text-sm text-gray-600 mb-2 line-clamp-2">{desc}</p>
         <div className="flex justify-between gap-6 items-center mb-4">
           <span className="text-xl font-bold text-green-600">₹{price}</span>
-          <span className="text-xs text-gray-500">{location}</span>
+          <span className="text-xs text-gray-500">
+            {location.slice(0, 30) + "..."}
+          </span>
         </div>
         <Link
           to={link}
@@ -177,7 +174,3 @@ const Card = ({
 };
 
 export default Card;
-
-
-
-
