@@ -135,7 +135,13 @@ function RoomsPage() {
   };
 
   const handlePriceRangeChange = (range) => {
-    console.log("Price range changed:", range);
+    setAdvanceFilter((prev) => ({
+      ...prev,
+      priceRange: {
+        min: range[0],
+        max: range[1],
+      },
+    }));
   };
   return (
     <>
