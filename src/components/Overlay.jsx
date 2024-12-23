@@ -6,18 +6,21 @@ import { axiosI } from "../axios";
 
 const Overlay = ({ setLocation, location }) => {
   const [Areas, setAreas] = useState([]);
+  const [loading, setLoading] = useState(false); // Add loading state
+
   const handleChange = async (e) => {
     if (e.target.value.length > 2) {
-      const { data } = await axiosI.get(
-        `/autosuggest_google?q=${e.target.value}`
-      );
+      setLoading(true); // Set loading to true when a request is made
+      const { data } = await axiosI.get(`/autosuggest_google?q=${e.target.value}`);
       console.log(data);
-      
 
       setAreas(data.predictions);
+      setLoading(false); // Set loading to false when response is received
     }
   };
+
   const handleClick = async (e) => {
+    setLoading(true); // Set loading to true when a request is made
     const { data } = await axios.get(
       "https://maps.googleapis.com/maps/api/geocode/json",
       {
@@ -33,8 +36,11 @@ const Overlay = ({ setLocation, location }) => {
       console.log(location);
     }
     setLocation(e);
+    setLoading(false); // Set loading to false when response is received
   };
+
   const getLocation = () => {
+    setLoading(true); // Set loading to true when requesting location
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude, longitude } = pos.coords;
@@ -42,14 +48,17 @@ const Overlay = ({ setLocation, location }) => {
           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyAy9lpoCJKj3p-ez31H9mNw5dM115WJr1Y`
         );
         setLocation(data.results[0].formatted_address);
+        setLoading(false); // Set loading to false when response is received
       },
       (err) => {
         alert(
           "We do not have permission to determine your location. Please enter manually"
         );
+        setLoading(false); // Set loading to false in case of error
       }
     );
   };
+
   return (
     <>
       <div className="overlay">
@@ -62,7 +71,7 @@ const Overlay = ({ setLocation, location }) => {
               <IoLocationOutline className="loca" />
               <p>
                 Please provide your location to start exploring nearby
-                accomodations choices.
+                accommodations choices.
               </p>
             </div>
             <div className="dend">
@@ -80,7 +89,10 @@ const Overlay = ({ setLocation, location }) => {
             </div>
           </div>
           <div className="detectbox">
-            {Areas &&
+            {loading ? (
+              <p className="text-center text-gray-500">Loading...</p>
+            ) : (
+              Areas &&
               Areas.map((area, i) => (
                 <div
                   key={i}
@@ -90,7 +102,8 @@ const Overlay = ({ setLocation, location }) => {
                   <IoLocationOutline className="local" />
                   <p> {area.description}</p>
                 </div>
-              ))}
+              ))
+            )}
           </div>
         </div>
       </div>

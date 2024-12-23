@@ -3,8 +3,10 @@ import GridCardLike from "../components/CardLike"; // Import your GridCardLike c
 import { axiosI } from "../axios";
 
 const GridComponent = () => {
+  const [loading, setLoading] = useState(true); // Loading state
   const [wishlistData, setWishlistData] = useState(null);
   const [wishlist, setWishlist] = useState([]);
+  const [itemsToShow, setItemsToShow] = useState(5); // Number of items to show initially
 
   // Fetch wishlist data from the API
   useEffect(() => {
@@ -19,6 +21,8 @@ const GridComponent = () => {
         console.log(response.data);
       } catch (error) {
         console.error("Error fetching wishlist:", error);
+      } finally {
+        setLoading(false); // Update loading state
       }
     };
 
@@ -43,16 +47,33 @@ const GridComponent = () => {
       });
   };
 
-  if (!wishlistData) {
-    // no data found
-    return <div className="font-poppins px-4 sm:px-8 py-6">No Data Found</div>;
+  const loadMoreItems = () => {
+    setItemsToShow((prev) => prev + 5); // Increase the number of items to show by 5
+  };
+
+  if (loading) {
+    // Show loader while fetching data
+    return (
+      <div className="font-poppins px-4 sm:px-8 py-6 text-center">
+        Loading wishlist...
+      </div>
+    );
+  }
+
+  if (!wishlistData || wishlist.length === 0) {
+    // No data or empty wishlist
+    return (
+      <div className="font-poppins px-4 sm:px-8 py-6 text-center">
+        No wishlist added.
+      </div>
+    );
   }
 
   return (
     <div className="font-poppins px-4 sm:px-8 py-6">
       {/* Grid Container */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {wishlistData.populatedItems.map((item, index) => {
+        {wishlistData.populatedItems.slice(0, itemsToShow).map((item, index) => {
           const { details, itemId, itemType } = item; // Destructure item details
           return (
             <GridCardLike
@@ -85,6 +106,18 @@ const GridComponent = () => {
           );
         })}
       </div>
+
+      {/* View More Properties Button */}
+      {itemsToShow < wishlistData.populatedItems.length && (
+        <div className="w-full text-center mt-[40px]">
+          <button
+            onClick={loadMoreItems}
+            className="bg-[#e4c1f9] w-[220px] sm:w-[370px] h-[60px] sm:h-[90px] rounded-[60px] font-normal text-lg sm:text-2xl border-b-4 border-gray-400 mb-[60px]"
+          >
+            View More Properties...
+          </button>
+        </div>
+      )}
     </div>
   );
 };

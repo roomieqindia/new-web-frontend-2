@@ -8,6 +8,8 @@ import { useAuth } from "../../utils/contextLogin";
 import LoginComponent from "./login";
 import CouponsRewards from "../pages/CouponsRewards";
 import SideChat from "./SideChat";
+import { toast } from "react-toastify"; // Import the toast library
+import "react-toastify/dist/ReactToastify.css"; // Import styles
 import { axiosI } from "../axios";
 
 function Navbar() {
@@ -53,6 +55,7 @@ function Navbar() {
 
         setisLoggedin(false);
         navigate("/");
+        toast.success("Logged out successfully");
       }
     } catch (error) {
       console.error("Error while logging out:", error);
@@ -66,6 +69,14 @@ function Navbar() {
   const handleNavigate = () => {
     navigate("/membership");
     setisOpen(false);
+  };
+  const handleAddListing = () => {
+    if (isLoggedin==false || isLoggedin==null) {
+      toast.info("Please login first to add a listing!");
+    } else {
+      // If logged in, proceed with the "Add Listing" action
+      navigate("/addlisting");
+    }
   };
 
   return (
@@ -172,13 +183,14 @@ function Navbar() {
                 </span>
               </button>
             ) : (
-              <Link to="/addlisting">
-                <button className="btn bg-[#FCF6BD] shadow-md border-b-4 border-slate-300 py-1 px-2 sm:py-2 sm:px-6 rounded-full">
-                  <span className="text-black text-xs sm:text-base lg:text-lg">
-                    Add Listing
-                  </span>
-                </button>
-              </Link>
+              <button
+                onClick={handleAddListing}
+                className="btn bg-[#FCF6BD] shadow-md border-b-4 border-slate-300 py-1 px-2 sm:py-2 sm:px-6 rounded-full"
+              >
+                <span className="text-black text-xs sm:text-base lg:text-lg">
+                  Add Listing
+                </span>
+              </button>
             )}
 
             {isLoggedin ? (
@@ -237,7 +249,6 @@ const ProfilePopup = ({ closePopup }) => {
   );
 };
 
-
 // eslint-disable-next-line react/prop-types
 const ProfileDropdown = ({
   userData,
@@ -246,7 +257,7 @@ const ProfileDropdown = ({
   handleLogout,
 }) => {
   const [coupon, setCoupon] = useState(false);
-  const [isProfilePopupOpen, setProfilePopupOpen] = useState(false);  // Add state for the profile popup
+  const [isProfilePopupOpen, setProfilePopupOpen] = useState(false); // Add state for the profile popup
 
   const handlecoupon = () => {
     setCoupon(true);
@@ -255,9 +266,9 @@ const ProfileDropdown = ({
 
   const openProfilePopup = () => {
     console.log("Open Profile Popup");
-    
+
     setProfilePopupOpen(true);
-    toggleDropdown();  // Close the dropdown when the popup is open
+    toggleDropdown(); // Close the dropdown when the popup is open
   };
 
   const closeProfilePopup = () => {
@@ -352,7 +363,5 @@ const ProfileDropdown = ({
     </div>
   );
 };
-
-
 
 export default Navbar;

@@ -9,6 +9,7 @@ import { axiosI } from "../axios";
 
 const SignupForm = () => {
   const navigate = useNavigate();
+  const [isSending, setIsSending] = useState(false);
   useEffect(() => {
     if (localStorage.getItem("isLoggedIn")) {
       navigate("/");
@@ -101,6 +102,7 @@ const SignupForm = () => {
   const sendOtp = async (e) => {
     e.preventDefault();
     if (!validateForm()) return; // If validation fails, do not send OTP
+    setIsSending(true);
 
     try {
       const { data } = await axiosI.post("/signup", formData);
@@ -116,6 +118,8 @@ const SignupForm = () => {
 
       // Show error message from backend in a toast
       toast.error(`Error: ${error.message || "Something went wrong"}`);
+    } finally {
+      setIsSending(false);
     }
   };
   return (
@@ -211,10 +215,14 @@ const SignupForm = () => {
             {/* Buttons */}
             <button
               type="submit"
-              // Call sendOtp on button click
-              className="w-full py-2 bg-[#E4C1F9] text-purple-700 rounded-lg hover:bg-purple-300 transition-colors text-sm font-medium relative top-4 h-10"
+              disabled={isSending} // Disable the button if OTP is being sent
+              className={`w-full py-2 bg-[#E4C1F9] text-purple-700 rounded-lg transition-colors text-sm font-medium relative top-4 h-10 ${
+                isSending
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Style for disabled state
+                  : "hover:bg-purple-300"
+              }`}
             >
-              Send OTP
+              {isSending ? "Sending..." : "Send OTP"}
             </button>
 
             <div className="flex items-center gap-2 my-2 relative top-4">

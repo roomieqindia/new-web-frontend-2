@@ -28,6 +28,7 @@ import { axiosI } from "../axios";
 function temphome() {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   // suggestion state
   const [suggestions, setSuggestions] = useState([]);
   const { userData } = useAuth();
@@ -61,6 +62,7 @@ function temphome() {
       return;
     }
     if (value.length < 3) return;
+    setIsFetching(true); // Start fetching
     try {
       const res = await axiosI.get("/search", {
         params: {
@@ -71,6 +73,8 @@ function temphome() {
       setSuggestions(res.data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsFetching(false);
     }
   };
 
@@ -123,8 +127,12 @@ function temphome() {
                 />
 
                 {/* Suggestion Box */}
-                {/* Suggestion Box */}
-                {suggestions.length > 0 && (
+                {isFetching && (
+                  <div className="absolute left-0 w-full bg-white border border-gray-200 shadow-lg rounded-b-lg top-full z-10 mt-1 p-4">
+                    <p className="text-center text-gray-500">Loading...</p>
+                  </div>
+                )}
+                {!isFetching && suggestions.length > 0 && (
                   <div className="absolute left-0 w-full bg-white border border-gray-200 shadow-lg rounded-b-lg top-full z-10 mt-1 max-h-72 overflow-y-auto">
                     <div className="flex flex-col divide-y divide-gray-200">
                       {suggestions.map((s, i) => (

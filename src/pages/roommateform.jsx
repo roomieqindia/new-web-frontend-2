@@ -24,6 +24,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useListingContext } from "../../utils/ListingContext";
 import { axiosI } from "../axios";
 import LocationInput from "../components/LocationInput";
+import { X } from "lucide-react";
 
 
 function RoommateLisitngForm() {
@@ -335,19 +336,20 @@ function RoommateLisitngForm() {
                 )}
 
                 {imagePreviews.length > 0 && (
-                  <div className="mt-4 grid grid-cols-3 gap-2">
+                  <div className="mt-4 grid place-items-center grid-cols-3 gap-2">
                     {imagePreviews.map((src, index) => (
                       <div key={index} className="relative">
                         <img
                           src={src}
                           alt="Preview"
-                          className="w-16 h-16 object-cover rounded-lg border border-gray-300"
+                          className="w-16 h-16 object-cover rounded-lg border border-zinc-700"
                         />
                         <button
                           onClick={() => removeImage(index)}
-                          className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full"
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300
+                        flex items-center justify-center"
                         >
-                          ×
+                          <X className="size-3" />
                         </button>
                       </div>
                     ))}

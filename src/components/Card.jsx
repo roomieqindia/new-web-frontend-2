@@ -166,7 +166,7 @@ const Card = ({
         </div>
         <Link
           to={link}
-          className="block w-full bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center"
         >
           Contact now
           <MessageCircle className="ml-2 w-5 h-5" />

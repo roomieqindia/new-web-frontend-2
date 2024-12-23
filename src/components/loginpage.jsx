@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/FinalLogo.png";
 import { useGoogleLogin } from "@react-oauth/google";
+import { toast } from "react-toastify"; // Import the toast library
+import "react-toastify/dist/ReactToastify.css"; // Import styles
 
-import { toast } from "react-toastify";
 
 import axios from "axios";
 import { axiosI } from "../axios";
@@ -89,34 +90,50 @@ const LoginForm = () => {
     return Object.keys(newErrors).length === 0; // Return true if no errors
   };
 
+  // Ensure toast is imported
+
+  // Add a `loading` state
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate form
     if (!validateForm()) return;
+
+    setLoading(true); // Disable button while processing
 
     try {
       const { data } = await axiosI.post("/login", formData);
+      console.log(data);
 
       if (!data.success) {
+        // Display error message from the backend
+        toast.error(data.message || "Login failed");
         setErrors({ sub: data.message });
+        setLoading(false); // Re-enable button
         return;
       }
 
-      setSuccess("Login successful!");
+      // Display success message
+      toast.success(data.message || "Login successful!");
 
-      toast.success("Login successful!");
+      // Save login state and user data
       localStorage.setItem("isLoggedIn", "true");
-      // dispatch({ type: "LOGIN" });
-
       if (data.user?.uid) {
         localStorage.setItem("user", data.user.uid);
       }
 
+      // Navigate to the home page
       setTimeout(() => {
         navigate("/", { state: { email: formData.email } });
       }, 1000);
     } catch (error) {
+      // Handle unexpected errors
       console.error("Error logging in:", error);
       toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false); // Re-enable button
     }
   };
 
@@ -177,9 +194,12 @@ const LoginForm = () => {
             {/* Buttons */}
             <button
               type="submit"
-              className="w-full py-2 bg-[#E4C1F9] text-purple-700 rounded-lg hover:bg-purple-300 transition-colors text-sm font-medium relative top-4 h-10"
+              className={`w-full py-2 bg-[#E4C1F9] text-purple-700 rounded-lg hover:bg-purple-300 transition-colors text-sm font-medium relative top-4 h-10 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={loading} // Disable button during loading
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
             {errors.password && (
               <p className="text-red-500 text-xs my-1">{errors.sub}</p>

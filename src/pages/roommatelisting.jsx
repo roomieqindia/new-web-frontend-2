@@ -75,6 +75,12 @@ const RoommateListingPage = () => {
     setSelectedUser(uid);
     setChatSelected(true);
   };
+  var settings = {
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
 
   var settings2 = {
     dots: true,
@@ -132,6 +138,38 @@ const RoommateListingPage = () => {
           {/* Main Content */}
           <div className="col-span-3 grid gap-8">
             {/* Details Section */}
+            <div className="rounded-[20px] bg-transparent w-full h-full min-w-[300px] min-h-[200px] max-h-[400px] relative">
+              <Slider {...settings}>
+                {officeData?.images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt="Office Image"
+                    className="w-full h-full object-cover rounded-[20px]"
+                  />
+                ))}
+              </Slider>
+              <div className="grid grid-cols-3 px-4 aspect-square lg:px-12 gap-6 absolute w-full max-h-[80px] md:max-h-[120px] xl:max-h-[150px] h-full -bottom-12 md:-bottom-16 left-[50%] -translate-x-[50%]">
+                {/* show only three images */}
+                {officeData?.images.slice(1, 4).map((image, index) => (
+                  <div
+                    key={index}
+                    className="h-full max-h-[80px] md:max-h-[120px] xl:max-h-[150px] w-full bg-[#d0f4de] rounded-[20px]  shadow-lg"
+                  >
+                    <img
+                      src={image}
+                      alt="Office Image"
+                      className="w-full h-full object-cover rounded-[20px]"
+                    />
+                  </div>
+                ))}
+              </div>
+              {officeData?.images.length > 4 && (
+                <div className="absolute bottom-0 right-0 md:bottom-4 md:right-4 p-3 flex justify-center items-center rounded-full bg-[#d0f4de] text-black font-bold">
+                  +&nbsp;{officeData?.images.length - 4}
+                </div>
+              )}
+            </div>
             <div className="bg-white rounded-lg shadow-md p-6 mt-16">
               <div className="flex flex-col md:flex-row justify-between mb-6">
                 <div>
