@@ -1,7 +1,7 @@
 import React from 'react'
 import AppStore from "../assets/AppStore.svg";
 import GooglePlay from "../assets/GooglePlay.svg";
-import SecondPhone from "../assets/SecondPhone.svg";
+import SecondPhone from "../assets/mobile.webp";
 const DownloadPromo = () => {
   return (
     <div className="bg-[#f8f8f8] flex flex-col items-center justify-center py-12 px-4 sm:px-8 lg:flex-row lg:py-16">

@@ -25,7 +25,7 @@ const Footer = () => {
             101, Shanti Aloknandan Behind TMT Bus Stop Shanti Nagar, Mira Road
             (E) Thane, 401107, Maharashtra
           </p>
-          <p className="text-base font-medium mt-4">Info@saathraho.com</p>
+          <p className="text-base font-medium mt-4">support@roomieqindia.com</p>
           <div className="flex space-x-4 text-gray-500 text-lg md:hidden">
             <a href="#instagram" className="hover:text-gray-700">
               <FontAwesomeIcon icon={faInstagram} />
@@ -206,7 +206,7 @@ const Footer = () => {
       {/* Bottom Links */}
       <div className="mt-8 border-t border-gray-300 pt-6 text-sm flex flex-col md:flex-row justify-between xs:items-center">
         <p className="text-gray-500 text-sm lg:text-base opacity-50">
-          &copy; 2024 saathraho.com. All Rights Reserved.
+          &copy; 2024 roomieqindia.com. All Rights Reserved.
         </p>
         <div className="flex space-x-4 opacity-50 mt-4 md:mt-0">
           <Link

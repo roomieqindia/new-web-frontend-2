@@ -1,83 +1,111 @@
-import React, { useState, useEffect } from 'react';
-import l from "../assets/legalnotice.svg";
-import Logo from "../assets/FinalLogo.png"; // Ensure this path is correct
+import React, { useEffect, useState } from "react";
+import DownloadPromo from "../components/DownloadPromo";
 import Footer from "../components/footer";
-import AppStore from "../assets/AppStore.svg";
-import GooglePlay from "../assets/GooglePlay.svg";
-import SecondPhone from "../assets/SecondPhone.svg";
-import Navbar from '../components/Navbar';
+import Navbar from "../components/Navbar";
 
-function CareerPage() {
+function LegalNotice() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      // Check if the window is scrolled down
       setIsScrolled(window.scrollY > 0);
     };
 
-    // Attach scroll event listener
     window.addEventListener("scroll", handleScroll);
 
-    // Cleanup function to remove the listener
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  // Placeholder function for the login button
-  const handleLoginClick = () => {
-    console.log("Log-in button clicked");
-  };
+  const legalSections = [
+    {
+      title: "Introduction",
+      content:
+        "RoomieQ India provides a platform that connects individuals seeking shared living arrangements, including roommates, rooms, hostels, PGs, and bhojanalays. Our Services are intended for users who are at least 16 years old.",
+    },
+    {
+      title: "Intellectual Property",
+      content:
+        "All content, features, and functionality available through our Services, including but not limited to text, graphics, logos, and software, are the exclusive property of RoomieQ India or our licensors and are protected by copyright, trademark, and other intellectual property laws.",
+    },
+    {
+      title: "No Liability",
+      content:
+        "While we strive to provide accurate and up-to-date information, RoomieQ India makes no warranties or representations regarding the completeness, accuracy, reliability, or availability of the content on our Services. We are not liable for any damages resulting from your reliance on such information.",
+    },
+    {
+      title: "User Responsibility",
+      content: (
+        <ul className="list-disc pl-5">
+          <li>Use the Services only for lawful purposes.</li>
+          <li>Not engage in any fraudulent or deceptive practices.</li>
+          <li>Respect the rights of other users and individuals.</li>
+        </ul>
+      ),
+    },
+    {
+      title: "Third-Party Links",
+      content:
+        "Our Services may contain links to third-party websites or services that are not owned or controlled by RoomieQ India. We are not responsible for the content, privacy policies, or practices of these third-party sites. We encourage you to review the terms and policies of any third-party sites you visit.",
+    },
+    {
+      title: "Governing Laws",
+      content:
+        "This Legal Notice shall be governed by and construed in accordance with the laws of Maharashtra, without regard to its conflict of law principles. Any disputes arising from or related to this notice shall be resolved in the courts located in Mumbai, Maharashtra.",
+    },
+    {
+      title: "Changes to This Legal Notice",
+      content:
+        "We reserve the right to modify this Legal Notice at any time. Any changes will be effective immediately upon posting the revised notice on this page, and your continued use of our Services following such changes constitutes your acceptance of the revised notice.",
+    },
+  ];
 
   return (
     <div className="sm:h-[1600px] h-[1200px] relative bg-white">
-      <Navbar/>
+      <Navbar />
 
-      {/* Main Content with Legal Notice Image */}
-      <div>
-        <img src={l} alt="Legal Notice" className="h-full w-full relative left-[-10px]" />
-      </div>
+      <div className="min-h-screen py-8 px-4 pt-32">
+        <div className="mx-auto bg-white p-6 rounded-md">
+          <h1 className="text-4xl font-bold text-gray-800 text-center mb-24">
+            Legal Notice
+          </h1>
+          <p className="text-gray-600 text-2xl mb-24 text-left">
+            This Legal Notice governs your use of the website and mobile
+            application (collectively referred to as "Services") operated by{" "}
+            <b>RoomieQ India</b>. By accessing or using our Services, you agree
+            to comply with the terms outlined below. If you do not agree, please
+            refrain from using our Services.
+          </p>
 
-      {/* Eighth Division  */}
-      <div className="w-[1540px] h-[850px] relative bg-[#f8f8f8] max-w-screen">
-        <div className="sm:left-[102px] sm:top-[230px] sm:absolute sm:text-black sm:text-4xl sm:font-medium sm:font-['Poppins'] font-poppins left-[65px] top-[360px] text-[30px] relative">
-          Connect with us
-          <br />
-          <span className="sm:relative relative sm:left-[0px] left-[-30px]">
-            from anywhere you{" "}
-            <span className="sm:top-[0px] top-[40px] relative sm:relative sm:left-[0px] left-[-180px]">
-              want
-            </span>
-          </span>
+          {legalSections.map((section, index) => (
+            <div key={index} className="mb-24">
+              <h2 className="text-3xl font-semibold text-gray-800 mb-12">
+                {section.title}
+              </h2>
+              <div className="text-gray-600 text-2xl">{section.content}</div>
+            </div>
+          ))}
+
+          <div>
+            <p className="text-gray-600 text-center">
+              For any questions or concerns regarding this Legal Notice, please
+              contact us at{" "}
+              <a
+                href="mailto:support@roomieqindia.com"
+                className="text-blue-600 underline"
+              >
+                support@roomieqindia.com
+              </a>
+              .
+            </p>
+          </div>
         </div>
-        <div className="sm:left-[102px] sm:top-[337px] absolute sm:absolute text-black sm:text-[25px] font-light font-['Poppins'] text-[25px] top-[550px] left-[26px]">
-          Download our app to get{" "}
-          <span className="absolute top-[50px] sm:relative sm:top-[0px] sm:left-[0px] left-[10px]">
-            a Rampage Experience
-          </span>
-        </div>
-        <img
-          className="sm:w-[887px] sm:h-[753px] sm:left-[706px] sm:top-[43px] sm:absolute absolute w-[500px] h-[600px] left-[-120px] top-[-240px]"
-          src={SecondPhone}
-        />
-        <button>
-          <img
-            className="sm:w-[345px] w-[180px] h-[180px] sm:h-[206px] sm:left-[62px] relative top-[560px] left-[10px] sm:top-[425px] sm:absolute sm:hover:w-[352px] sm:hover:h-[214px] "
-            src={GooglePlay}
-          />
-        </button>
-        <button>
-          <img
-            className=" sm:w-[343px] w-[180px] sm:h-[280px] h-[180px] sm:left-[378px] left-[8px] sm:top-[384px]  top-[560px]  relative sm:hover:w-[360px] sm:hover:h-[290px]"
-            src={AppStore}
-          />
-        </button>
       </div>
-      
-      <Footer/>
+      <DownloadPromo />
+      <Footer />
     </div>
   );
 }
 
-export default CareerPage;
+export default LegalNotice;
