@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
 import Card from "../components/Card";
+import Overlay from "../components/Overlay";
 
 function RoomsPage() {
   const [roomList, setRoomList] = useState([]);
@@ -35,6 +36,22 @@ function RoomsPage() {
   });
   const [loading, setLoading] = useState(true);
   const { userLocation, fetchLocation } = useLocation();
+
+  const [location, setLocation] = useState(null);
+  useEffect(() => {
+    if (location) {
+      localStorage.setItem("location", location);
+    }
+    setLoading(false);
+  }, [location]);
+  useEffect(() => {
+    const l = localStorage.getItem("location");
+    setLocation(l);
+  }, []);
+  const handleReset = () => {
+    localStorage.removeItem("location");
+    setLocation(null);
+  };
   useEffect(() => {
     // Fetch rooms with filter and userLocation
     fetchRooms();
@@ -123,6 +140,8 @@ function RoomsPage() {
   return (
     <>
       <Navbar />
+      {!location && <Overlay setLocation={setLocation} location={location} />}
+
       <div className="mb-[20px]">
         <div className="relative bg-white overflow-hidden h-auto pt-8">
           {/* Background Houses */}
@@ -172,19 +191,17 @@ function RoomsPage() {
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
               Home \ Rooms
             </p>
-            <div className="flex items-center w-full sm:w-[350px] bg-white border-[.5px] border-black shadow-md rounded-full px-4 py-2">
-              <img
-                src={Filter}
-                alt="Filter Icon"
-                className="h-5 sm:h-6 w-5 sm:w-6"
-              />
-              <input
-                type="text"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                placeholder="Filter by name, location..."
-                className="w-full bg-transparent focus:outline-none placeholder-gray-500 ml-2"
-              />
+            <div className="flex items-center bg-white gap-4">
+              {location?.split(",").slice(0, 3).join(", ")}
+              <button
+                className=" text-gray-500 px-2 py-1 border-[.5px] border-gray-500 rounded-md"
+                onClick={() => {
+                  localStorage.removeItem("location");
+                  setLocation(null);
+                }}
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
@@ -210,7 +227,6 @@ function RoomsPage() {
                   <label className="text-lg">By Budget</label>
                   <label className="text-xs mb-4">Choose a range below</label>
                   <div className="flex items-center space-x-2">
-                   
                     <PriceRangeSlider
                       min={0}
                       max={100000}
@@ -406,21 +422,21 @@ function RoomsPage() {
                 {/* Buttons */}
                 <div className="flex justify-between mt-4">
                   <button
-                    className="py-2 px-8 rounded-lg border-[.5px] border-black"
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black"
                     onClick={handleClearFilter}
                   >
-                    Clear All
+                    Clear
                   </button>
                   <button
-                    className="py-2 px-8 rounded-lg border-[.5px] border-black"
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black"
                     onClick={handleFilter}
                   >
-                    Apply Filters
+                    Apply
                   </button>
                 </div>
               </div>
               {/* Grid Container */}
-              <div id="listing">
+              <div id="listing" className="w-4/5">
                 {roomList.map((room, index) => (
                   <div key={index}>
                     <Card
