@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
 import PriceRangeSlider from "../components/PriceRangeSlider";
+import ProductCard from "./Demo";
 
 function BhojnalayasPage() {
   const [BhojnalayasList, setBhojnalayasList] = useState([]);
@@ -318,24 +319,26 @@ function BhojnalayasPage() {
                 </div>
               </div>
               {/* Grid Container */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 w-4/5">
-                {BhojnalayasList.map((room, index) => (
-                  <div key={index}>
-                    <GridCardLike
-                      title={room.bhojanalayName}
-                      desc={room.description}
-                      img={room.images[0]}
-                      price={room.priceOfThali}
-                      location={room.location}
-                      link={`/Bhojnalaya/${room._id}`}
-                      verified={room.uid.verified}
-                      isFeatureListing={room.uid.isFeatureListing}
-                      isWishlisted={wishlist.includes(room._id)}
-                      toggleWishlist={() => toggleWishlist(room._id)}
-                      distance={room.distance}
-                    />
-                  </div>
-                ))}
+              <div>
+                <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {BhojnalayasList.map((room, index) => (
+                    <div key={index}>
+                      <ProductCard
+                        title={room.bhojanalayName}
+                        desc={room.description}
+                        img={room.images[0]}
+                        price={room.priceOfThali}
+                        location={room.location}
+                        link={`/Bhojnalaya/${room._id}`}
+                        verified={room.uid.verified}
+                        isFeatureListing={room.uid.isFeatureListing}
+                        isWishlisted={wishlist.includes(room._id)}
+                        toggleWishlist={() => toggleWishlist(room._id)}
+                        distance={room.distance}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

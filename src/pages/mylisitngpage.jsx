@@ -64,46 +64,47 @@ const MyListings = () => {
         {loading ? (
           <p className="text-center w-full">Loading listings...</p>
         ) : myListings.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {myListings.slice(0, visibleListings).map((listing, index) => {
-              const { _id, itemType, ...details } = listing; // Extract details
-              return (
-                <GridCardLike
-                  key={index}
-                  _id={_id}
-                  title={
-                    details.name ||
-                    details.bhojanalayName ||
-                    details.roomName ||
-                    details.officeName ||
-                    details.hostelName ||
-                    "Listing"
-                  }
-                  desc={details.description || "No description provided"}
-                  price={
-                    details.rent ||
-                    details.priceOfThali ||
-                    details.monthlyMaintenance ||
-                    "N/A"
-                  }
-                  occupation={details.occupation || ""}
-                  location={details.location || "Location not specified"}
-                  link={`/${details.type}/${_id}`} // Link to listing details page
-                  img={details.images?.[0] || "/default-image.jpg"}
-                  verified={details.uid?.verified || false}
-                  isFeatureListing={details.uid?.isFeatureListing || false}
-                  isWishlisted={wishlist.includes(_id)} // Check if the listing is in the wishlist
-                  toggleWishlist={() => toggleWishlist(_id, itemType)} // Toggle wishlist action
-                  type={details.type}
-                />
-              );
-            })}
+          <div>
+            <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {myListings.slice(0, visibleListings).map((listing, index) => {
+                const { _id, itemType, ...details } = listing; // Extract details
+                return (
+                  <ProductCard
+                    key={index}
+                    _id={_id}
+                    title={
+                      details.name ||
+                      details.bhojanalayName ||
+                      details.roomName ||
+                      details.officeName ||
+                      details.hostelName ||
+                      "Listing"
+                    }
+                    desc={details.description || "No description provided"}
+                    price={
+                      details.rent ||
+                      details.priceOfThali ||
+                      details.monthlyMaintenance ||
+                      "N/A"
+                    }
+                    occupation={details.occupation || ""}
+                    location={details.location || "Location not specified"}
+                    link={`/${details.type}/${_id}`} // Link to listing details page
+                    img={details.images?.[0] || "/default-image.jpg"}
+                    verified={details.uid?.verified || false}
+                    isFeatureListing={details.uid?.isFeatureListing || false}
+                    isWishlisted={wishlist.includes(_id)} // Check if the listing is in the wishlist
+                    toggleWishlist={() => toggleWishlist(_id, itemType)} // Toggle wishlist action
+                    type={details.type}
+                  />
+                );
+              })}
+            </div>
           </div>
         ) : (
           <p className="text-center w-full">No listings found.</p>
         )}
       </div>
-
       {myListings.length > visibleListings && (
         <div className="w-full text-center">
           <button
@@ -114,10 +115,8 @@ const MyListings = () => {
           </button>
         </div>
       )}
-
       {/* Download Promo Section */}
       <DownloadPromo />
-
       {/* Footer Component */}
       <Footer />
     </>

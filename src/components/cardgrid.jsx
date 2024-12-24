@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import GridCardLike from "../components/CardLike"; // Import your GridCardLike component
 import { axiosI } from "../axios";
+import ProductCard from "../pages/Demo";
 
 const GridComponent = () => {
   const [loading, setLoading] = useState(true); // Loading state
@@ -72,39 +73,43 @@ const GridComponent = () => {
   return (
     <div className="font-poppins px-4 sm:px-8 py-6">
       {/* Grid Container */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {wishlistData.populatedItems.slice(0, itemsToShow).map((item, index) => {
-          const { details, itemId, itemType } = item; // Destructure item details
-          return (
-            <GridCardLike
-              key={index}
-              title={
-                details?.name ||
-                details?.bhojanalayName ||
-                details?.roomName ||
-                details?.officeName ||
-                details?.hostelName
-              }
-              desc={details?.description || "Description not available"}
-              // priceOfThali , monthlyMaintenance , rent
-              price={
-                details?.priceOfThali ||
-                details?.monthlyMaintenance ||
-                details?.rent ||
-                ""
-              }
-              occupation={details?.occupation || "Not specified"}
-              location={details?.location || "Location not specified"}
-              link={`/${details.type}/${itemId}`} // Example link, adjust according to your routing
-              img={details?.images || "/default-image?.jpg"} // Placeholder image
-              verified={details?.uid?.verified || false}
-              isFeatureListing={details?.uid?.isFeatureListing || false}
-              isWishlisted={wishlist?.includes(itemId)}
-              toggleWishlist={() => toggleWishlist(itemId, itemType)}
-              distance={details?.distance}
-            />
-          );
-        })}
+      <div>
+        <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {wishlistData.populatedItems
+            .slice(0, itemsToShow)
+            .map((item, index) => {
+              const { details, itemId, itemType } = item; // Destructure item details
+              return (
+                <ProductCard
+                  key={index}
+                  title={
+                    details?.name ||
+                    details?.bhojanalayName ||
+                    details?.roomName ||
+                    details?.officeName ||
+                    details?.hostelName
+                  }
+                  desc={details?.description || "Description not available"}
+                  // priceOfThali , monthlyMaintenance , rent
+                  price={
+                    details?.priceOfThali ||
+                    details?.monthlyMaintenance ||
+                    details?.rent ||
+                    ""
+                  }
+                  occupation={details?.occupation || "Not specified"}
+                  location={details?.location || "Location not specified"}
+                  link={`/${details.type}/${itemId}`} // Example link, adjust according to your routing
+                  img={details?.images || "/default-image?.jpg"} // Placeholder image
+                  verified={details?.uid?.verified || false}
+                  isFeatureListing={details?.uid?.isFeatureListing || false}
+                  isWishlisted={wishlist?.includes(itemId)}
+                  toggleWishlist={() => toggleWishlist(itemId, itemType)}
+                  distance={details?.distance}
+                />
+              );
+            })}
+        </div>
       </div>
 
       {/* View More Properties Button */}

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
 import PriceRangeSlider from "../components/PriceRangeSlider";
+import ProductCard from "./Demo";
 
 function OfficePage() {
   const [OfficeList, setOfficeList] = useState([]);
@@ -301,10 +302,7 @@ function OfficePage() {
                   <label className="text-xs mb-4">
                     Choose from below options
                   </label>
-                  {[
-                    "Price: Low to High",
-                    "Price: High to Low",
-                  ].map((e) => (
+                  {["Price: Low to High", "Price: High to Low"].map((e) => (
                     <div
                       className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer
                     ${
@@ -340,24 +338,26 @@ function OfficePage() {
                 </div>
               </div>
               {/* Grid Container */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 w-4/5">
-                {OfficeList.map((office, index) => (
-                  <div key={index}>
-                    <GridCardLike
-                      title={office.title}
-                      desc={office.description}
-                      img={office.images[0]}
-                      price={office.monthlyMaintenance}
-                      location={office.location}
-                      link={`/office/${office._id}`}
-                      verified={office.uid.verified}
-                      isFeatureListing={office.uid.isFeatureListing}
-                      isWishlisted={wishlist.includes(office._id)}
-                      toggleWishlist={() => toggleWishlist(office._id)}
-                      distance={office.distance}
-                    />
-                  </div>
-                ))}
+              <div>
+                <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {OfficeList.map((office, index) => (
+                    <div key={index}>
+                      <ProductCard
+                        title={office.title}
+                        desc={office.description}
+                        img={office.images[0]}
+                        price={office.monthlyMaintenance}
+                        location={office.location}
+                        link={`/office/${office._id}`}
+                        verified={office.uid.verified}
+                        isFeatureListing={office.uid.isFeatureListing}
+                        isWishlisted={wishlist.includes(office._id)}
+                        toggleWishlist={() => toggleWishlist(office._id)}
+                        distance={office.distance}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

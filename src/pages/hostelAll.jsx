@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
 import PriceRangeSlider from "../components/PriceRangeSlider";
+import ProductCard from "./Demo";
 
 function HostelsPage() {
   const [HostelsList, setHostelsList] = useState([]);
@@ -314,24 +315,26 @@ function HostelsPage() {
                 </div>
               </div>
               {/* Grid Container */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 w-4/5">
-                {HostelsList.map((hostel, index) => (
-                  <div key={index}>
-                    <GridCardLike
-                      title={hostel?.hostelName}
-                      desc={hostel?.description}
-                      img={hostel?.images[0]}
-                      price={hostel?.rent}
-                      location={hostel?.location}
-                      link={`/Hostel/${hostel?._id}`}
-                      verified={hostel?.uid?.verified}
-                      isFeatureListing={hostel?.uid?.isFeatureListing}
-                      isWishlisted={wishlist?.includes(hostel?._id)}
-                      toggleWishlist={() => toggleWishlist(hostel._id)}
-                      distance={hostel.distance}
-                    />
-                  </div>
-                ))}
+              <div>
+                <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {HostelsList.map((hostel, index) => (
+                    <div key={index}>
+                      <ProductCard
+                        title={hostel?.hostelName}
+                        desc={hostel?.description}
+                        img={hostel?.images[0]}
+                        price={hostel?.rent}
+                        location={hostel?.location}
+                        link={`/Hostel/${hostel?._id}`}
+                        verified={hostel?.uid?.verified}
+                        isFeatureListing={hostel?.uid?.isFeatureListing}
+                        isWishlisted={wishlist?.includes(hostel?._id)}
+                        toggleWishlist={() => toggleWishlist(hostel._id)}
+                        distance={hostel.distance}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

@@ -49,6 +49,7 @@ const Overlay = ({ setLocation, location }) => {
         );
         setLocation(data.results[0].formatted_address);
         setLoading(false); // Set loading to false when response is received
+        window.location.reload();
       },
       (err) => {
         alert(
