@@ -4,6 +4,7 @@ import Footer from "../components/footer"; // Footer Component
 import DownloadPromo from "../components/DownloadPromo"; // Download Promo Component
 import GridCardLike from "../components/CardLike"; // Card Component
 import { axiosI } from "../axios"; // Axios instance for API requests
+import ProductCard from "./Demo";
 
 const MyListings = () => {
   const [myListings, setMyListings] = useState([]);
@@ -65,7 +66,7 @@ const MyListings = () => {
           <p className="text-center w-full">Loading listings...</p>
         ) : myListings.length > 0 ? (
           <div>
-            <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className=" grid sm:grid-cols-2 lg:grid-cols-3">
               {myListings.slice(0, visibleListings).map((listing, index) => {
                 const { _id, itemType, ...details } = listing; // Extract details
                 return (

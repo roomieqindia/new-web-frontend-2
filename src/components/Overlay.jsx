@@ -36,7 +36,8 @@ const Overlay = ({ setLocation, location }) => {
       console.log(location);
     }
     setLocation(e);
-    setLoading(false); // Set loading to false when response is received
+    setLoading(false);
+    window.location.reload(); // Set loading to false when response is received
   };
 
   const getLocation = () => {

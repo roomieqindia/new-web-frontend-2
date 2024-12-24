@@ -31,6 +31,8 @@ function BhojnalayasPage() {
     },
     parcelOfFood: "",
     veg: "",
+    lat: userLocation?.lat,
+    lng: userLocation?.lng,
   });
   const handleFilter = async () => {
     // Filter rooms with advanceFilter
@@ -96,6 +98,14 @@ function BhojnalayasPage() {
   }, []);
 
   useEffect(() => {
+    setAdvanceFilter((prev) => {
+      return {
+        ...prev,
+        lat: userLocation?.lat,
+        lng: userLocation?.lng,
+      };
+
+    })
     fetchBhojnalayas();
     axiosI.get("/wishlist").then((res) => {
       setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
@@ -185,7 +195,7 @@ function BhojnalayasPage() {
           </div>
 
           {/* Footer Section */}
-          <div className="relative z-50 -mt-20 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-16 py-8 space-y-4 sm:space-y-0">
+          <div className="card-section relative z-50 -mt-20 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-16 py-8 space-y-4 sm:space-y-0">
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
               Home \ Bhojnalayas
             </p>
@@ -214,7 +224,7 @@ function BhojnalayasPage() {
       ) : (
         <>
           <div className="px-4">
-            <div className="font-poppins py-6 flex justify-between">
+            <div className="font-poppins py-6 flex gap-2">
               <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt">
                 <div className="text-2xl text-center w-full">
                   FILTERS & SORTING
@@ -305,14 +315,24 @@ function BhojnalayasPage() {
                 <div className="flex justify-between mt-4">
                   <button
                     className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
-                    onClick={handleClearFilter}
+                    onClick={() => {
+                      handleClearFilter();
+                      document
+                        .querySelector(".card-section")
+                        .scrollIntoView({ behavior: "smooth" });
+                    }}
                   >
                     Clear
                   </button>
                   <button
                     // add transition of .5s
                     className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
-                    onClick={handleFilter}
+                    onClick={() => {
+                      handleFilter();
+                      document
+                        .querySelector(".card-section")
+                        .scrollIntoView({ behavior: "smooth" });
+                    }}
                   >
                     Apply
                   </button>

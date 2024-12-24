@@ -12,6 +12,7 @@ import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
 import PriceRangeSlider from "../components/PriceRangeSlider";
 import ProductCard from "./Demo";
+import Overlay from "../components/Overlay";
 
 function OfficePage() {
   const [OfficeList, setOfficeList] = useState([]);
@@ -32,7 +33,23 @@ function OfficePage() {
       max: "",
     },
     sortBy: "",
+    lat: userLocation?.lat,
+    lng: userLocation?.lng,
   });
+  const [location, setLocation] = useState(null);
+
+  useEffect(() => {
+    if (location) {
+      localStorage.setItem("location", location);
+    }
+    setLoading(false);
+  }, [location]);
+
+  useEffect(() => {
+    const l = localStorage.getItem("location");
+    setLocation(l);
+  }, []);
+
   const handleFilter = async () => {
     // Filter offices with advanceFilter
     const { data } = await axiosI.post("/filter/offices", advanceFilter);
@@ -95,6 +112,14 @@ function OfficePage() {
     fetchLocation();
   }, []);
   useEffect(() => {
+    setAdvanceFilter((prev) => {
+      return {
+        ...prev,
+        lat: userLocation?.lat,
+        lng: userLocation?.lng,
+      };
+
+    })
     fetchOffice();
     axiosI.get("/wishlist").then((res) => {
       setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
@@ -138,6 +163,7 @@ function OfficePage() {
   return (
     <>
       <Navbar />
+      {!location && <Overlay setLocation={setLocation} location={location} />}
       <div className="mb-[20px]">
         <div className="relative bg-white overflow-hidden h-auto pt-8">
           {/* Background Houses */}
@@ -183,23 +209,21 @@ function OfficePage() {
           </div>
 
           {/* Footer Section */}
-          <div className="relative z-50 -mt-20 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-16 py-8 space-y-4 sm:space-y-0">
+          <div className="card-section relative z-50 -mt-20 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-16 py-8 space-y-4 sm:space-y-0">
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
               Home \ Offices
             </p>
-            <div className="flex items-center w-full sm:w-[350px] bg-white border border-black shadow-md rounded-full px-4 py-2">
-              <img
-                src={Filter}
-                alt="Filter Icon"
-                className="h-5 sm:h-6 w-5 sm:w-6"
-              />
-              <input
-                type="text"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                placeholder="Filter by name, location..."
-                className="w-full bg-transparent focus:outline-none placeholder-gray-500 ml-2"
-              />
+            <div className="flex items-center bg-white gap-4">
+              {location?.split(",").slice(0, 3).join(", ")}
+              <button
+                className="text-gray-500 hover:text-white bg-gray-100 hover:bg-slate-500 px-3 py-1 border border-gray-500 rounded-md transition duration-200"
+                onClick={() => {
+                  localStorage.removeItem("location");
+                  setLocation(null);
+                }}
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
@@ -212,7 +236,7 @@ function OfficePage() {
       ) : (
         <>
           <div className="px-4">
-            <div className="font-poppins py-6 flex justify-between">
+            <div className="font-poppins py-6 flex gap-2">
               <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt ">
                 <div className="text-2xl text-center w-full">
                   FILTERS & SORTING
@@ -324,14 +348,24 @@ function OfficePage() {
                 <div className="flex justify-between mt-4">
                   <button
                     className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
-                    onClick={handleClearFilter}
+                    onClick={() => {
+                      handleClearFilter();
+                      document
+                        .querySelector(".card-section")
+                        .scrollIntoView({ behavior: "smooth" });
+                    }}
                   >
                     Clear
                   </button>
                   <button
                     // add transition of .5s
                     className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
-                    onClick={handleFilter}
+                    onClick={() => {
+                      handleFilter();
+                      document
+                        .querySelector(".card-section")
+                        .scrollIntoView({ behavior: "smooth" });
+                    }}
                   >
                     Apply
                   </button>

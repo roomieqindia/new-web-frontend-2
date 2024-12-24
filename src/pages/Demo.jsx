@@ -85,7 +85,7 @@ function ProductCard({
 
             {/* Description */}
             <p className="text-gray-600 text-sm line-clamp-2">
-              {desc.length>20 ? desc.slice(0, 20)+"..." : desc
+              {desc.length>20 ? desc.slice(0, 25)+"..." : desc
             
               }
 

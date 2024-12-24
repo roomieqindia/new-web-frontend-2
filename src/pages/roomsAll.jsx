@@ -15,12 +15,15 @@ import Card from "../components/Card";
 import Overlay from "../components/Overlay";
 import Demo from "./Demo";
 import ProductCard from "./Demo";
-import Shimmer from "../components/Shimmer";
+import { set } from "react-hook-form";
 
 function RoomsPage() {
+  const { userLocation, fetchLocation } = useLocation();
   const [roomList, setRoomList] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [filter, setFilter] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [location, setLocation] = useState(null);
   const [advanceFilter, setAdvanceFilter] = useState({
     priceRange: {
       min: 0,
@@ -36,12 +39,10 @@ function RoomsPage() {
       max: "",
     },
     sortBy: "",
+    lat: userLocation?.lat,
+    lng: userLocation?.lng,
   });
-  const [loading, setLoading] = useState(true);
-  const { userLocation, fetchLocation } = useLocation();
-  const [fectching, setFetching] = useState(false);
 
-  const [location, setLocation] = useState(null);
   useEffect(() => {
     if (location) {
       localStorage.setItem("location", location);
@@ -52,23 +53,24 @@ function RoomsPage() {
     const l = localStorage.getItem("location");
     setLocation(l);
   }, []);
-  const handleReset = () => {
-    localStorage.removeItem("location");
-    setLocation(null);
-  };
+
   useEffect(() => {
-    // Fetch rooms with filter and userLocation
+    setAdvanceFilter((prev) => {
+      return {
+        ...prev,
+        lat: userLocation?.lat,
+        lng: userLocation?.lng,
+      };
+    });
     fetchRooms();
-    // Fetch wishlist items
     fetchWishlist();
   }, [filter, userLocation]);
+
   useEffect(() => {
     fetchLocation();
   }, []);
 
   const fetchRooms = () => {
-    setFetching(true);
-
     axiosI
       .get("/rooms", {
         params: {
@@ -80,7 +82,7 @@ function RoomsPage() {
       .then((res) => {
         setRoomList(res.data);
         console.log(res.data);
-        setFetching(false);
+
         setLoading(false);
       });
   };
@@ -112,11 +114,9 @@ function RoomsPage() {
   };
 
   const handleFilter = async () => {
-    setFetching(true);
     // Filter rooms with advanceFilter
     const { data } = await axiosI.post("/filter/rooms", advanceFilter);
     setRoomList(data);
-    setFetching(false);
     console.log(data);
   };
 
@@ -205,10 +205,8 @@ function RoomsPage() {
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
               Home \ Rooms
             </p>
-            <div className="flex items-center bg-white gap-4 p-4  rounded-md">
-              <span className="text-gray-700 font-medium">
-                {location?.split(",").slice(0, 3).join(", ")}
-              </span>
+            <div className="flex items-center bg-white gap-4">
+              {location?.split(",").slice(0, 3).join(", ")}
               <button
                 className="text-gray-500 hover:text-white bg-gray-100 hover:bg-slate-500 px-3 py-1 border border-gray-500 rounded-md transition duration-200"
                 onClick={() => {
@@ -223,16 +221,11 @@ function RoomsPage() {
         </div>
         <div className="bg-black mx-auto w-[85%] sm:w-[94%] h-[1px] ml-[6] mt-3"></div>
       </div>
-
       <>
         <div className="px-4">
           <div className="font-poppins py-6 flex gap-2">
             {/* advance Filter */}
-            <div
-              className={`flex flex-col mx-6  ${
-                fectching ? "w-[50%]" : "w-1/5"
-              } border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt`}
-            >
+            <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt">
               <div className="text-2xl text-center w-full">
                 FILTERS & SORTING
               </div>
@@ -435,16 +428,15 @@ function RoomsPage() {
                 ))}
               </div>
               <div className="border-b border-gray-400 my-2"></div>
-
+              {/* Buttons */}
               <div className="flex justify-between mt-4">
                 <button
                   className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
                   onClick={() => {
                     handleClearFilter();
-                    const h = document
+                    document
                       .querySelector(".card-section")
                       .scrollIntoView({ behavior: "smooth" });
-                    console.log(h);
                   }}
                 >
                   Clear
@@ -454,10 +446,9 @@ function RoomsPage() {
                   className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
                   onClick={() => {
                     handleFilter();
-                    const h = document
+                    document
                       .querySelector(".card-section")
                       .scrollIntoView({ behavior: "smooth" });
-                    console.log(h);
                   }}
                 >
                   Apply
@@ -465,34 +456,25 @@ function RoomsPage() {
               </div>
             </div>
 
-            {/* Grid Container */}
-            {fectching ? (
-              <div>
-                <Shimmer />
+            <div>
+              <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {roomList.map((room, index) => (
+                  <ProductCard
+                    title={room.roomName}
+                    desc={room.description}
+                    img={room.images?.[0]} // Safe navigation for images array
+                    price={room.monthlyMaintenance}
+                    location={room.location}
+                    link={`/room/${room._id}`}
+                    verified={room.uid?.verified || false}
+                    isFeatureListing={room.uid?.isFeatureListing}
+                    isWishlisted={wishlist.includes(room._id)}
+                    toggleWishlist={() => toggleWishlist(room._id)}
+                    distance={room.distance}
+                  />
+                ))}
               </div>
-            ) : roomList.length === 0 ? (
-              <p className="text-lg font-semibold">No rooms found.</p>
-            ) : (
-              <div>
-                <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {roomList.map((room, index) => (
-                    <ProductCard
-                      title={room.roomName}
-                      desc={room.description || "No Description"}
-                      img={room.images?.[0]} // Safe navigation for images array
-                      price={room.monthlyMaintenance}
-                      location={room.location}
-                      link={`/room/${room._id}`}
-                      verified={room.uid?.verified || false}
-                      isFeatureListing={room.uid?.isFeatureListing}
-                      isWishlisted={wishlist.includes(room._id)}
-                      toggleWishlist={() => toggleWishlist(room._id)}
-                      distance={room.distance}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </>
@@ -543,28 +525,5 @@ function RoomsPage() {
     </>
   );
 }
-
-// const Shimmer = () => {
-//   return (
-//     <div className="flex flex-wrap gap-4">
-//       {Array(10)
-//         .fill("")
-//         .map((_, index) => (
-//           <div
-//             key={index}
-//             className="w-96 h-80 bg-gray-200 rounded-lg overflow-hidden relative"
-//           >
-//             <div className="animate-shimmer absolute inset-0 -translate-x-full bg-gradient-to-r from-gray-200 via-white to-gray-200" />
-//             <div className="h-40 bg-gray-300 rounded-t-lg" />
-//             <div className="p-4 space-y-3">
-//               <div className="h-4 bg-gray-300 rounded w-3/4" />
-//               <div className="h-4 bg-gray-300 rounded w-1/2" />
-//               <div className="h-4 bg-gray-300 rounded w-2/3" />
-//             </div>
-//           </div>
-//         ))}
-//     </div>
-//   );
-// };
 
 export default RoomsPage;

@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
 import ProductCard from "./Demo";
-import Shimmer from "../components/Shimmer";
 
 function RoommatesPage() {
   const [RoommateList, setRoommateList] = useState([]);
@@ -21,20 +20,18 @@ function RoommatesPage() {
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const { userLocation, fetchLocation } = useLocation();
-  const [fectching, setFetching] = useState(false);
   const [advanceFilter, setAdvanceFilter] = useState({
     gender: "",
     roomPreference: "",
     locationPreference: "",
     sortBy: "",
+    lat: userLocation?.lat,
+    lng: userLocation?.lng,
   });
   const handleFilter = async () => {
-    setFetching(true);
-
     // Filter rooms with advanceFilter
     const { data } = await axiosI.post("/filter/roommates", advanceFilter);
     setRoommateList(data);
-    setFetching(false);
     console.log(data);
   };
 
@@ -50,8 +47,6 @@ function RoommatesPage() {
     fetchRoomates();
   };
   const fetchRoomates = () => {
-    setFetching(true);
-
     axiosI
       .get("/roommates", {
         params: {
@@ -63,7 +58,6 @@ function RoommatesPage() {
       .then((res) => {
         setRoommateList(res.data);
         console.log(RoommateList);
-        setFetching(false);
 
         setLoading(false);
         axiosI.get("/wishlist").then((res) => {
@@ -75,6 +69,15 @@ function RoommatesPage() {
     fetchLocation();
   }, []);
   useEffect(() => {
+    setAdvanceFilter((prev) => {
+      return {
+        ...prev,
+        lat: userLocation?.lat,
+        lng: userLocation?.lng,
+      };
+
+    })
+    
     fetchRoomates();
   }, [filter, userLocation]);
   const toggleWishlist = (id) => {
@@ -164,6 +167,7 @@ function RoommatesPage() {
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
               Home \ Roommates
             </p>
+            
             <div className="flex items-center w-full sm:w-[350px] bg-white border border-black shadow-md rounded-full px-4 py-2">
               <img
                 src={Filter}
@@ -182,102 +186,97 @@ function RoommatesPage() {
         </div>
         <div className="bg-black mx-auto w-[85%] sm:w-[94%] h-[1px] ml-[6] mt-3"></div>
       </div>
-      <>
-        <div className="px-4">
-          <div className="font-poppins py-6 flex justify-between">
-            <div
-              className={`flex flex-col mx-6  ${
-                fectching ? "w-[53%]" : "w-1/5"
-              } border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt`}
-            >
-              <div className="text-2xl text-center w-full">
-                FILTERS & SORTING
-              </div>
-              {/* divider */}
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* By gender */}
-              <div className="flex flex-col space">
-                <label className="text-lg">By Gender</label>
-                <label className="text-xs mb-4">
-                  Choose from below options
-                </label>
-                {["Male", "Female"].map((e) => (
-                  <div
-                    className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
-                      advanceFilter.gender === e
-                        ? "bg-[#bedbfe] border-blue-500"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      setAdvanceFilter((prev) => ({ ...prev, gender: e }))
-                    }
-                    key={e}
+      {loading ? (
+        <div className="flex justify-center py-4">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-500"></div>
+        </div>
+      ) : (
+        <>
+          <div className="px-4">
+            <div className="font-poppins py-6 flex gap-2">
+              <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt">
+                <div className="text-2xl text-center w-full">
+                  FILTERS & SORTING
+                </div>
+                {/* divider */}
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* By gender */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Gender</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["Male", "Female"].map((e) => (
+                    <div
+                      className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
+                        advanceFilter.gender === e
+                          ? "bg-[#bedbfe] border-blue-500"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setAdvanceFilter((prev) => ({ ...prev, gender: e }))
+                      }
+                      key={e}
+                    >
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                {/* By Room Preference */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Room Preference</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["Hostel", "PG", "Flat", "Room"].map((e) => (
+                    <div
+                      className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
+                        advanceFilter.roomPreference === e
+                          ? "bg-[#bedbfe] border-blue-500"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setAdvanceFilter((prev) => ({
+                          ...prev,
+                          roomPreference: e,
+                        }))
+                      }
+                      key={e}
+                    >
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Buttons */}
+                <div className="flex justify-between mt-4">
+                  <button
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
+                    onClick={() => {
+                      handleClearFilter();
+                      document
+                        .querySelector(".card-section")
+                        .scrollIntoView({ behavior: "smooth" });
+                    }}
                   >
-                    {e}
-                  </div>
-                ))}
-              </div>
-              {/* By Room Preference */}
-              <div className="flex flex-col space">
-                <label className="text-lg">By Room Preference</label>
-                <label className="text-xs mb-4">
-                  Choose from below options
-                </label>
-                {["Hostel", "PG", "Flat", "Room"].map((e) => (
-                  <div
-                    className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
-                      advanceFilter.roomPreference === e
-                        ? "bg-[#bedbfe] border-blue-500"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      setAdvanceFilter((prev) => ({
-                        ...prev,
-                        roomPreference: e,
-                      }))
-                    }
-                    key={e}
+                    Clear
+                  </button>
+                  <button
+                    // add transition of .5s
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
+                    onClick={() => {
+                      handleFilter();
+                     document
+                        .querySelector(".card-section")
+                        .scrollIntoView({ behavior: "smooth" });
+                     
+                    }}
                   >
-                    {e}
-                  </div>
-                ))}
+                    Apply
+                  </button>
+                </div>
               </div>
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* Buttons */}
-              <div className="flex justify-between mt-4">
-                <button
-                  className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
-                  onClick={() => {
-                    handleClearFilter();
-                    document
-                      .querySelector(".card-section")
-                      .scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  Clear
-                </button>
-                <button
-                  // add transition of .5s
-                  className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
-                  onClick={() => {
-                    handleFilter();
-                    document
-                      .querySelector(".card-section")
-                      .scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
-            {/* Grid Container */}
-            {fectching ? (
-              <div>
-                <Shimmer />
-              </div>
-            ) : RoommateList.length === 0 ? (
-              <p className="text-lg font-semibold">No rooms found.</p>
-            ) : (
+              {/* Grid Container */}
               <div>
                 <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {RoommateList.map((room, index) => (
@@ -299,15 +298,15 @@ function RoommatesPage() {
                   ))}
                 </div>
               </div>
-            )}
+            </div>
           </div>
-        </div>
-        {/* <div className="w-full text-center">
+          {/* <div className="w-full text-center">
             <button className="mt-[40px] bg-[#e4c1f9] w-[220px] sm:w-[370px] h-[60px] sm:h-[90px] rounded-[60px] font-normal text-lg sm:text-2xl border-b-4 border-gray-400 mb-[60px]">
               View More Properties...
             </button>
           </div> */}
-      </>
+        </>
+      )}
 
       {/* Eighth Division  */}
       <div className="bg-[#f8f8f8] flex flex-col items-center justify-center py-12 px-4 sm:px-8 lg:flex-row lg:py-16">

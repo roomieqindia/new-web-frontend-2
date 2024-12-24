@@ -10,33 +10,6 @@ export const LocationProvider = ({ children }) => {
   const [longitude, setLongitude] = useState(null);
 
   const fetchLocation = async () => {
-    // try {
-    //   // Check if geolocation is available in the browser
-    //   if ("geolocation" in navigator) {
-    //     navigator.geolocation.getCurrentPosition(
-    //       (position) => {
-    //         const { latitude, longitude } = position.coords;
-    //         const userLocation = { latitude, longitude };
-    //         console.log(userLocation);
-    //         setUserLocation(userLocation);
-            
-    //         setLoading(false);
-    //       },
-    //       (error) => {
-    //         console.error("Error fetching geolocation:", error),{
-    //           enableHighAccuracy: true,
-    //         }
-    //         setLoading(false);
-    //       }
-    //     );
-    //   } else {
-    //     console.error("Geolocation is not supported by this browser.");
-    //     setLoading(false);
-    //   }
-    // } catch (error) {
-    //   console.error("An error occurred while fetching the location:", error);
-    //   setLoading(false);
-    // }
     const { data } = await axios.get(
       "https://maps.googleapis.com/maps/api/geocode/json",
       {
