@@ -10,16 +10,18 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 // import VerifiedComponent from "../components/VerifiedComponent";
 import { axiosI } from "../axios";
-import { useLocation } from "../../utils/LocationContext";
+import { useLocationContext } from "../../utils/LocationContext";
 import ProductCard from "./Demo";
 import Overlay from "../components/Overlay";
+import { useLocation } from "react-router-dom";
 
 function RoommatesPage() {
-  const { userLocation, fetchLocation } = useLocation();
+  const { userLocation, fetchLocation } = useLocationContext();
   const [RoommateList, setRoommateList] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [advanceFilter, setAdvanceFilter] = useState({
     gender: "",
     roomPreference: "",
@@ -28,7 +30,14 @@ function RoommatesPage() {
     lat: userLocation?.lat,
     lng: userLocation?.lng,
   });
+  const { pathname } = useLocation();
   const [location, setLocation] = useState(localStorage.getItem("location"));
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // Enables smooth scrolling
+    });
+  }, [pathname]);
 
   useEffect(() => {
     if (location) {
@@ -75,7 +84,7 @@ function RoommatesPage() {
 
   const handleFilter = async () => {
     // Filter rooms with advanceFilter
-    
+
     const { data } = await axiosI.post("/filter/roommates", advanceFilter);
     setRoommateList(data);
     console.log(data);
@@ -108,6 +117,9 @@ function RoommatesPage() {
       .catch((err) => {
         console.error("Error toggling wishlist: ", err);
       });
+  };
+  const handleToggleFilter = () => {
+    setIsFilterVisible(!isFilterVisible);
   };
 
   return (
@@ -180,6 +192,9 @@ function RoommatesPage() {
         </div>
         <div className="bg-black mx-auto w-[85%] sm:w-[94%] h-[1px] ml-[6] mt-3"></div>
       </div>
+      <div className="flex justify-end items-center sm:hidden mb-4">
+        <button onClick={handleToggleFilter}>open filter</button>
+      </div>
       {loading ? (
         <div className="flex justify-center py-4">
           <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-500"></div>
@@ -188,7 +203,30 @@ function RoommatesPage() {
         <>
           <div className="px-4">
             <div className="font-poppins py-6 flex gap-2">
-              <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt">
+              <div
+                className={`fixed inset-y-0 left-[-24px] top-[66px] z-50 w-full bg-white shadow-lg transform ${
+                  isFilterVisible ? "translate-x-0" : "-translate-x-full"
+                } transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0 sm:w-1/5 sm:shadow-none flex flex-col mx-6 border-[.5px] p-4 rounded-lg border-gray-900 overflow-y-auto`}
+              >
+                <button
+                  className="sm:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                  onClick={handleToggleFilter}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
                 <div className="text-2xl text-center w-full">
                   FILTERS & SORTING
                 </div>
@@ -251,6 +289,7 @@ function RoommatesPage() {
                       document
                         .querySelector(".card-section")
                         .scrollIntoView({ behavior: "smooth" });
+                      setIsFilterVisible(false);
                     }}
                   >
                     Clear
@@ -263,6 +302,7 @@ function RoommatesPage() {
                       document
                         .querySelector(".card-section")
                         .scrollIntoView({ behavior: "smooth" });
+                      setIsFilterVisible(false);
                     }}
                   >
                     Apply

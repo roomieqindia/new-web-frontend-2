@@ -51,6 +51,7 @@ import RoommatesPage from "./pages/roommateAll";
 import RoomsPage from "./pages/roomsAll";
 import Transaction from "./pages/Transaction";
 import Demo from "./pages/Demo";
+import ScrollToTop from "./components/ScrollToTop"
 
 // import Cards from "./components/cards";
 
@@ -63,6 +64,7 @@ export default function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Define your routes here */}
         <Route path="/testing" element={<Testing />} />

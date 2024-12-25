@@ -58,6 +58,6 @@ export const LocationProvider = ({ children }) => {
   );
 };
 
-export const useLocation = () => {
+export const useLocationContext = () => {
   return useContext(LocationContext);
 };

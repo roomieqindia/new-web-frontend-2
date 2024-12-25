@@ -8,12 +8,12 @@ import SecondPhone from "../assets/SecondPhone.svg";
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
-import { useLocation } from "../../utils/LocationContext";
+import { useLocationContext } from "../../utils/LocationContext";
 import Overlay from "../components/Overlay";
 import ProductCard from "./Demo";
 
 function RoomsPage() {
-  const { userLocation, fetchLocation } = useLocation();
+  const { userLocation, fetchLocation } = useLocationContext();
   const [roomList, setRoomList] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [filter, setFilter] = useState("");
@@ -37,6 +37,7 @@ function RoomsPage() {
     lng: userLocation?.lng,
   });
   const [location, setLocation] = useState(localStorage.getItem("location"));
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
 
   useEffect(() => {
     if (location) {
@@ -146,8 +147,8 @@ function RoomsPage() {
   };
 
   const handleToggleFilter = () => {
-    document.querySelector(".filter-cnt").classList.toggle("hidden");
-  }
+    setIsFilterVisible(!isFilterVisible);
+  };
 
   return (
     <>
@@ -219,12 +220,12 @@ function RoomsPage() {
         <div className="bg-black mx-auto w-[85%] sm:w-[94%] h-[1px] ml-[6] mt-3"></div>
       </div>
       {/* filter button for mobile screen */}
-      <div className="flex justify-center items-center sm:hidden">
+      <div className="flex justify-end items-center sm:hidden mb-4">
         <button
           className="bg-black text-white px-4 py-2 rounded-lg"
           onClick={handleToggleFilter}
         >
-          Filter
+          {isFilterVisible ? 'Close Filter' : 'Open Filter'}
         </button>
       </div>
       <>
@@ -236,7 +237,15 @@ function RoomsPage() {
           <div className="px-4">
             <div className="font-poppins py-6 flex gap-2">
               {/* advance Filter */}
-              <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt  sm:block">
+              <div className={`fixed inset-y-0 left-[-24px] top-[66px] z-50 w-full bg-white shadow-lg transform ${isFilterVisible ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0 sm:w-1/5 sm:shadow-none flex flex-col mx-6 border-[.5px] p-4 rounded-lg border-gray-900 overflow-y-auto`}>
+                <button 
+                  className="sm:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                  onClick={handleToggleFilter}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
                 <div className="text-2xl text-center w-full">
                   FILTERS & SORTING
                 </div>
@@ -448,6 +457,8 @@ function RoomsPage() {
                       document
                         .querySelector(".card-section")
                         .scrollIntoView({ behavior: "smooth" });
+                        setIsFilterVisible(false)
+
                     }}
                   >
                     Clear
@@ -460,6 +471,7 @@ function RoomsPage() {
                       document
                         .querySelector(".card-section")
                         .scrollIntoView({ behavior: "smooth" });
+                        setIsFilterVisible(false);
                     }}
                   >
                     Apply
@@ -547,3 +559,4 @@ function RoomsPage() {
 }
 
 export default RoomsPage;
+
