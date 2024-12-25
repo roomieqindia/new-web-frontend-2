@@ -4,7 +4,7 @@ import Logo from "../assets/FinalLogo.png"; // Ensure the path to Logo is correc
 import Footer from "../components/footer";
 import AppStore from "../assets/AppStore.svg";
 import GooglePlay from "../assets/GooglePlay.svg";
-import SecondPhone from "../assets/SecondPhone.svg";
+import SecondPhone from "../assets/mobile.webp";
 import Navbar from '../components/Navbar';
 
 function CareerPage() {

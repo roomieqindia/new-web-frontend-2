@@ -5,10 +5,10 @@ import chatic from "../assets/Chat Bubble.svg";
 import Chatbot from "../pages/ChatBot";
 import { Link } from "react-router-dom";
 
-const SideChat = () => {
+const SideChat = ({isFilterVisible}) => {
   return (
-    <div>
-      <div className="fixed right-6 z-1 bottom-6 sm:right-[60px] sm:bottom-[60px]">
+    <div className={isFilterVisible ? "hidden" : ""}>
+      <div className="fixed right-6 z-10 bottom-6 sm:right-[60px] sm:bottom-[60px]">
         <div className="dropdown dropdown-top dropdown-end">
           <div tabIndex={0} role="button" className="">
             <button className="w-12 h-12 sm:w-16 sm:h-16 bg-[#48a36b] rounded-full shadow-lg flex items-center justify-center">

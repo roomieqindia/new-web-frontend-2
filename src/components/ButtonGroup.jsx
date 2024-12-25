@@ -31,8 +31,13 @@ function ButtonGroup({
             type="button"
             onClick={() => handleButtonClick(option)}
             className={` ${optionClass} ${
-              selectedValue === option ? "bg-gray-200" : "bg-transparent"
-            } p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 hover:bg-gray-200 transition-colors`}
+              selectedValue === option
+                ? "bg-white ring-2 ring-purple-200"
+                : "bg-transparent ring-1 ring-gray-500"
+            } p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 hover:bg-white transition-colors 
+              drop-shadow-2xl
+            `}
+            // add shadow
           >
             {option}
           </button>

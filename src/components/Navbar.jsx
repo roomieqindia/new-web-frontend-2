@@ -12,7 +12,7 @@ import { toast } from "react-toastify"; // Import the toast library
 import "react-toastify/dist/ReactToastify.css"; // Import styles
 import { axiosI } from "../axios";
 
-function Navbar() {
+function Navbar({ isFilterVisible }) {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoginVisible, setLoginVisible] = useState(false);
@@ -71,7 +71,7 @@ function Navbar() {
     setisOpen(false);
   };
   const handleAddListing = () => {
-    if (isLoggedin==false || isLoggedin==null) {
+    if (isLoggedin == false || isLoggedin == null) {
       toast.info("Please login first to add a listing!");
     } else {
       // If logged in, proceed with the "Add Listing" action
@@ -84,9 +84,7 @@ function Navbar() {
       {/* Navbar */}
 
       <nav
-        className={`fixed w-full z-[100] transition-shadow duration-300 ${
-          isScrolled ? "bg-white shadow-lg" : "bg-[#D0F4DE]"
-        }`}
+        className={`fixed w-full z-[100] transition-shadow duration-300  ${isScrolled ? "bg-white shadow-lg" : "bg-[#D0F4DE]"} ${isFilterVisible && "blur-sm"}`}
       >
         {isOpen && (
           <div
@@ -199,6 +197,7 @@ function Navbar() {
                 toggleDropdown={toggleDropdown}
                 handleLogout={handleLogout}
                 userData={userData}
+                isFilterVisible={isFilterVisible}
               />
             ) : (
               <>
@@ -255,6 +254,7 @@ const ProfileDropdown = ({
   isOpen,
   toggleDropdown,
   handleLogout,
+  isFilterVisible
 }) => {
   const [coupon, setCoupon] = useState(false);
   const [isProfilePopupOpen, setProfilePopupOpen] = useState(false); // Add state for the profile popup
@@ -277,7 +277,7 @@ const ProfileDropdown = ({
 
   return (
     <div className="relative">
-      <SideChat />
+      <SideChat isFilterVisible={isFilterVisible} />
       <div
         onClick={toggleDropdown}
         className="cursor-pointer flex items-center"

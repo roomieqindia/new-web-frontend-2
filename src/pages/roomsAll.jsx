@@ -4,7 +4,7 @@ import Footer from "../components/footer";
 import PriceRangeSlider from "../components/PriceRangeSlider";
 import AppStore from "../assets/AppStore.svg";
 import GooglePlay from "../assets/GooglePlay.svg";
-import SecondPhone from "../assets/SecondPhone.svg";
+import SecondPhone from "../assets/mobile.webp";
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
@@ -152,9 +152,10 @@ function RoomsPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar isFilterVisible={isFilterVisible} />
       {!location && <Overlay setLocation={setLocation} location={location} />}
-      <div className="mb-[20px]">
+      {/* if isFilterVisible is true blur the main div */}
+      <div className={`mb-[20px] ${isFilterVisible && "blur-sm"}`}>
         <div className="relative bg-white overflow-hidden h-auto pt-8">
           {/* Background Houses */}
           <img
@@ -184,7 +185,7 @@ function RoomsPage() {
           />
 
           {/* Main Content */}
-          <div className="relative z-10 flex flex-col items-center justify-center py-16 sm:py-32 space-y-6">
+          <div className=" z-10 flex flex-col items-center justify-center py-16 sm:py-32 space-y-6">
             <h1 className="text-2xl sm:text-5xl font-bold font-poppins text-black">
               Rooms
             </h1>
@@ -199,35 +200,30 @@ function RoomsPage() {
           </div>
 
           {/* Footer Section */}
-          <div className="card-section relative z-50 -mt-20 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-16 py-8 space-y-4 sm:space-y-0">
+          <div className="card-section relative z-10 -mt-20 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-16 py-4 space-y-4 sm:space-y-0 sm:w-full">
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
               Home \ Rooms
             </p>
-            <div className="flex items-center bg-white gap-4">
-              {location?.split(",").slice(0, 3).join(", ")}
-              <button
-                className="text-gray-500 hover:text-white bg-gray-100 hover:bg-slate-500 px-3 py-1 border border-gray-500 rounded-md transition duration-200"
+            <div className="flex items-center bg-white gap-4 justify-between px-3 pt-8 max-xs:w-full ">
+              <span
                 onClick={() => {
                   localStorage.removeItem("location");
                   setLocation(null);
                 }}
               >
-                Reset
+                {location.length > 20
+                  ? location?.slice(0, 25) + "..."
+                  : location}
+              </span>
+              <button className="sm:hidden" onClick={handleToggleFilter}>
+                <img src="filter.svg" className="w-6 h-6" alt="" />
               </button>
             </div>
           </div>
         </div>
-        <div className="bg-black mx-auto w-[85%] sm:w-[94%] h-[1px] ml-[6] mt-3"></div>
+        <div className="bg-black mx-auto w-[85%] sm:w-[94%] h-[1px] ml-[6] mt-1"></div>
       </div>
       {/* filter button for mobile screen */}
-      <div className="flex justify-end items-center sm:hidden mb-4">
-        <button
-          className="bg-black text-white px-4 py-2 rounded-lg"
-          onClick={handleToggleFilter}
-        >
-          {isFilterVisible ? 'Close Filter' : 'Open Filter'}
-        </button>
-      </div>
       <>
         {loading ? (
           <div className="flex justify-center py-4">
@@ -237,13 +233,28 @@ function RoomsPage() {
           <div className="px-4">
             <div className="font-poppins py-6 flex gap-2">
               {/* advance Filter */}
-              <div className={`fixed inset-y-0 left-[-24px] top-[66px] z-50 w-full bg-white shadow-lg transform ${isFilterVisible ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0 sm:w-1/5 sm:shadow-none flex flex-col mx-6 border-[.5px] p-4 rounded-lg border-gray-900 overflow-y-auto`}>
-                <button 
+              <div
+                className={`fixed inset-x-0 bottom-0 z-50 w-full h-[80vh] bg-white shadow-lg transform ${
+                  isFilterVisible ? "translate-y-0" : "translate-y-full"
+                } transition-transform duration-300 ease-in-out sm:relative sm:translate-y-0 sm:w-1/5 sm:h-auto sm:shadow-none flex flex-col sm:mx-6 border-t-[.5px] sm:border-[.5px] p-4 sm:rounded-lg border-gray-900 overflow-y-auto`}
+              >
+                <button
                   className="sm:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                   onClick={handleToggleFilter}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
                 <div className="text-2xl text-center w-full">
@@ -449,7 +460,7 @@ function RoomsPage() {
                 </div>
                 <div className="border-b border-gray-400 my-2"></div>
                 {/* Buttons */}
-                <div className="flex justify-between mt-4">
+                <div className="flex justify-between my-4">
                   <button
                     className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
                     onClick={() => {
@@ -457,8 +468,7 @@ function RoomsPage() {
                       document
                         .querySelector(".card-section")
                         .scrollIntoView({ behavior: "smooth" });
-                        setIsFilterVisible(false)
-
+                      setIsFilterVisible(false);
                     }}
                   >
                     Clear
@@ -471,7 +481,7 @@ function RoomsPage() {
                       document
                         .querySelector(".card-section")
                         .scrollIntoView({ behavior: "smooth" });
-                        setIsFilterVisible(false);
+                      setIsFilterVisible(false);
                     }}
                   >
                     Apply
@@ -479,7 +489,7 @@ function RoomsPage() {
                 </div>
               </div>
 
-              <div>
+              <div className={isFilterVisible ? "blur-sm" : ""}>
                 <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {roomList.length > 0 ? (
                     roomList.map((room, index) => (
@@ -512,7 +522,11 @@ function RoomsPage() {
       </>
 
       {/* Eighth Division  */}
-      <div className="bg-[#f8f8f8] flex flex-col items-center justify-center py-12 px-4 sm:px-8 lg:flex-row lg:py-16">
+      <div
+        className={`bg-[#f8f8f8] flex flex-col items-center justify-center py-12 px-4 sm:px-8 lg:flex-row lg:py-16 ${
+          isFilterVisible && "blur-sm"
+        }`}
+      >
         {/* Left Section: Text Content */}
         <div className="flex flex-col space-y-6 text-center lg:text-left lg:max-w-md">
           <h2 className="text-black text-2xl sm:text-3xl lg:text-4xl font-medium font-poppins">
@@ -552,11 +566,11 @@ function RoomsPage() {
           />
         </div>
       </div>
-
-      <Footer />
+      <div className={isFilterVisible && "blur-sm"}>
+        <Footer />
+      </div>
     </>
   );
 }
 
 export default RoomsPage;
-
