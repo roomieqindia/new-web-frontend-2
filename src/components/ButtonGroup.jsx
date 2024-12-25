@@ -39,8 +39,8 @@ function ButtonGroup({
             style={{
               boxShadow:
                 selectedValue === option
-                  ? "4px 4px 10px 0px #e9d5ff"
-                  : "4px 4px 10px 0px #4f4f4f",
+                  ? "4px 4px 5px 0px #e9d5ff"
+                  : "4px 4px 5px 0px #4f4f4f",
               borderWidth: selectedValue === option ? "2px" : "1px",
               borderColor: selectedValue === option ? "#e9d5ff" : "#4f4f4f",
             }}
