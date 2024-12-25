@@ -28,6 +28,19 @@ function RoommatesPage() {
     lat: userLocation?.lat,
     lng: userLocation?.lng,
   });
+   const [location, setLocation] = useState(null);
+
+
+  useEffect(() => {
+    if (location) {
+      localStorage.setItem("location", location);
+    }
+    setLoading(false);
+  }, [location]);
+  useEffect(() => {
+    const l = localStorage.getItem("location");
+    setLocation(l);
+  }, []);
   const handleFilter = async () => {
     // Filter rooms with advanceFilter
     const { data } = await axiosI.post("/filter/roommates", advanceFilter);
@@ -168,19 +181,17 @@ function RoommatesPage() {
               Home \ Roommates
             </p>
             
-            <div className="flex items-center w-full sm:w-[350px] bg-white border border-black shadow-md rounded-full px-4 py-2">
-              <img
-                src={Filter}
-                alt="Filter Icon"
-                className="h-5 sm:h-6 w-5 sm:w-6"
-              />
-              <input
-                type="text"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                placeholder="Filter by name, location..."
-                className="w-full bg-transparent focus:outline-none placeholder-gray-500 ml-2"
-              />
+            <div className="flex items-center bg-white gap-4">
+              {location?.split(",").slice(0, 3).join(", ")}
+              <button
+                className="text-gray-500 hover:text-white bg-gray-100 hover:bg-slate-500 px-3 py-1 border border-gray-500 rounded-md transition duration-200"
+                onClick={() => {
+                  localStorage.removeItem("location");
+                  setLocation(null);
+                }}
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
