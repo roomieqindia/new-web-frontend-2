@@ -12,14 +12,14 @@ import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
 import ProductCard from "./Demo";
+import Overlay from "../components/Overlay";
 
 function RoommatesPage() {
+  const { userLocation, fetchLocation } = useLocation();
   const [RoommateList, setRoommateList] = useState([]);
-  const [filteredRoommateList, setFilteredRoommateList] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
-  const { userLocation, fetchLocation } = useLocation();
   const [advanceFilter, setAdvanceFilter] = useState({
     gender: "",
     roomPreference: "",
@@ -28,21 +28,54 @@ function RoommatesPage() {
     lat: userLocation?.lat,
     lng: userLocation?.lng,
   });
-   const [location, setLocation] = useState(null);
-
+  const [location, setLocation] = useState(localStorage.getItem("location"));
 
   useEffect(() => {
     if (location) {
       localStorage.setItem("location", location);
     }
-    setLoading(false);
   }, [location]);
+
   useEffect(() => {
-    const l = localStorage.getItem("location");
-    setLocation(l);
+    setAdvanceFilter((prev) => {
+      return {
+        ...prev,
+        lat: userLocation?.lat,
+        lng: userLocation?.lng,
+      };
+    });
+    fetchRoomates();
+  }, [filter, userLocation]);
+  useEffect(() => {
+    fetchLocation();
   }, []);
+  const fetchRoomates = async () => {
+    if (!userLocation) return;
+    setLoading(true);
+
+    try {
+      const { data } = await axiosI.get("/roommates", {
+        params: {
+          filter,
+          lat: userLocation?.lat,
+          lng: userLocation?.lng,
+        },
+      });
+      setRoommateList(data);
+      if (data) {
+        const res = await axiosI.get("/wishlist");
+        setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleFilter = async () => {
     // Filter rooms with advanceFilter
+    
     const { data } = await axiosI.post("/filter/roommates", advanceFilter);
     setRoommateList(data);
     console.log(data);
@@ -59,45 +92,9 @@ function RoommatesPage() {
     // Fetch rooms with filter and userLocation
     fetchRoomates();
   };
-  const fetchRoomates = () => {
-    axiosI
-      .get("/roommates", {
-        params: {
-          filter,
-          lat: userLocation?.lat,
-          lng: userLocation?.lng,
-        },
-      })
-      .then((res) => {
-        setRoommateList(res.data);
-        console.log(RoommateList);
 
-        setLoading(false);
-        axiosI.get("/wishlist").then((res) => {
-          setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
-        });
-      });
-  };
-  useEffect(() => {
-    fetchLocation();
-  }, []);
-  useEffect(() => {
-    setAdvanceFilter((prev) => {
-      return {
-        ...prev,
-        lat: userLocation?.lat,
-        lng: userLocation?.lng,
-      };
-
-    })
-    
-    fetchRoomates();
-  }, [filter, userLocation]);
   const toggleWishlist = (id) => {
-    console.log("Toggling wishlist for: ", id);
-
     const isWishlisted = wishlist.includes(id);
-    console.log("isWishlisted: ", isWishlisted);
 
     axiosI
       .post("/wishlist/toggle", { itemId: id, itemType: "Roommate" })
@@ -113,24 +110,10 @@ function RoommatesPage() {
       });
   };
 
-  // useEffect(() => {
-  //   const filtered = RoommateList.filter((room) => {
-  //     return (
-  //       room.name.toLowerCase().includes(filter.toLowerCase()) ||
-  //       room.location.toLowerCase().includes(filter.toLowerCase())
-  //     );
-  //   });
-  //   const sorted = filtered.sort((a, b) => {
-  //     if (b.uid.isFeatureListing && !a.uid.isFeatureListing) return 1;
-  //     if (a.uid.isFeatureListing && !b.uid.isFeatureListing) return -1;
-  //     return 0;
-  //   });
-  //   setFilteredRoommateList(sorted);
-  // }, [filter, RoommateList]);
-
   return (
     <>
       <Navbar />
+      {!location && <Overlay setLocation={setLocation} location={location} />}
       <div className="mb-[20px]">
         <div className="relative bg-white overflow-hidden h-auto pt-8">
           {/* Background Houses */}
@@ -180,7 +163,7 @@ function RoommatesPage() {
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
               Home \ Roommates
             </p>
-            
+
             <div className="flex items-center bg-white gap-4">
               {location?.split(",").slice(0, 3).join(", ")}
               <button
@@ -277,10 +260,9 @@ function RoommatesPage() {
                     className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
                     onClick={() => {
                       handleFilter();
-                     document
+                      document
                         .querySelector(".card-section")
                         .scrollIntoView({ behavior: "smooth" });
-                     
                     }}
                   >
                     Apply
@@ -290,23 +272,29 @@ function RoommatesPage() {
               {/* Grid Container */}
               <div>
                 <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {RoommateList.map((room, index) => (
-                    <div key={index}>
-                      <ProductCard
-                        title={room.name}
-                        desc={room.description}
-                        img={room.images[0]}
-                        occupation={room.occupation}
-                        location={room.location}
-                        link={`/roommate/${room._id}`}
-                        verified={room.uid.verified}
-                        isFeatureListing={room.uid.isFeatureListing}
-                        isWishlisted={wishlist.includes(room._id)}
-                        toggleWishlist={() => toggleWishlist(room._id)}
-                        distance={room.distance}
-                      />
+                  {RoommateList.length > 0 ? (
+                    RoommateList.map((room, index) => (
+                      <div key={index}>
+                        <ProductCard
+                          title={room.name}
+                          desc={room.description}
+                          img={room.images[0]}
+                          occupation={room.occupation}
+                          location={room.location}
+                          link={`/roommate/${room._id}`}
+                          verified={room.uid.verified}
+                          isFeatureListing={room.uid.isFeatureListing}
+                          isWishlisted={wishlist.includes(room._id)}
+                          toggleWishlist={() => toggleWishlist(room._id)}
+                          distance={room.distance}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-2xl font-bold">
+                      No Roommates Found
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>

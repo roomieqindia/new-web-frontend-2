@@ -108,7 +108,6 @@ function RoomLisitngForm() {
             uid: userData._id,
           });
       if (response.data) {
-
         toast.success(
           state?.update
             ? "Room updated successfully"
@@ -177,7 +176,7 @@ function RoomLisitngForm() {
           const response = await axiosI.get(`/rooms/${state.id}`);
           const roomData = response.data;
           console.log(roomData, "room data");
-          
+
           setValue("roomName", roomData.roomName);
           setValue("location", roomData.location);
           setValue("title", roomData.title);
@@ -204,7 +203,7 @@ function RoomLisitngForm() {
         } catch (error) {
           toast.error("Failed to fetch room details");
         }
-      }
+      };
       fetchRoomDetails();
     }
   }, [state]);
@@ -479,7 +478,7 @@ function RoomLisitngForm() {
                 <ButtonGroup
                   label="No. of Bathroom"
                   name="bathroom"
-                  options={["1 Bathroom", "2 Bathroom", "3 Bathroom"]}
+                  options={["1 Bathroom", "2 Bathrooms", "3 Bathrooms"]}
                   setValue={setValue}
                   getValues={getValues}
                   error={errors.bathroom}

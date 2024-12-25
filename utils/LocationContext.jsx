@@ -29,7 +29,7 @@ export const LocationProvider = ({ children }) => {
     
   };
   useEffect(()=>{
-    fetchLocation();
+    // fetchLocation();
   },[])
 
 

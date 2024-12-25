@@ -1,7 +1,5 @@
-import GridCardLike from "../components/CardLike";
 import Category from "../assets/category.svg";
 import House from "../assets/House.svg";
-import Filter from "../assets/filter.png";
 import Footer from "../components/footer";
 import AppStore from "../assets/AppStore.svg";
 import GooglePlay from "../assets/GooglePlay.svg";
@@ -16,7 +14,6 @@ import Overlay from "../components/Overlay";
 
 function OfficePage() {
   const [OfficeList, setOfficeList] = useState([]);
-  const [filteredOfficeList, setFilteredOfficeList] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
@@ -36,25 +33,36 @@ function OfficePage() {
     lat: userLocation?.lat,
     lng: userLocation?.lng,
   });
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState(localStorage.getItem("location"));
 
   useEffect(() => {
     if (location) {
       localStorage.setItem("location", location);
     }
-    setLoading(false);
   }, [location]);
 
   useEffect(() => {
-    const l = localStorage.getItem("location");
-    setLocation(l);
+    fetchLocation();
   }, []);
+
+  useEffect(() => {
+    setAdvanceFilter((prev) => {
+      return {
+        ...prev,
+        lat: userLocation?.lat,
+        lng: userLocation?.lng,
+      };
+    });
+    fetchOffice();
+    axiosI.get("/wishlist").then((res) => {
+      setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
+    });
+  }, [filter, userLocation]);
 
   const handleFilter = async () => {
     // Filter offices with advanceFilter
     const { data } = await axiosI.post("/filter/offices", advanceFilter);
     setOfficeList(data);
-    console.log(data);
   };
 
   const handleClearFilter = () => {
@@ -85,6 +93,7 @@ function OfficePage() {
       },
     }));
   };
+
   const handleSuperBuildAreaChange = (range) => {
     setAdvanceFilter((prev) => ({
       ...prev,
@@ -94,42 +103,35 @@ function OfficePage() {
       },
     }));
   };
-  const fetchOffice = () => {
-    axiosI
-      .get("/office-listings", {
+
+  const fetchOffice = async () => {
+    if (!userLocation) return;
+    setLoading(true);
+    try {
+      const { data } = await axiosI.get("/office-listings", {
         params: {
           filter,
           lat: userLocation?.lat,
           lng: userLocation?.lng,
         },
-      })
-      .then((res) => {
-        setOfficeList(res.data);
-        setLoading(false);
       });
+
+      setOfficeList(data);
+      if (data) {
+        const res = await axiosI.get("/wishlist");
+        setWishlist(
+          Array.isArray(res?.data?.itemIds) ? res?.data?.itemIds : []
+        );
+      }
+    } catch (err) {
+      console.error("Error fetching office: ", err);
+    } finally {
+      setLoading(false);
+    }
   };
-  useEffect(() => {
-    fetchLocation();
-  }, []);
-  useEffect(() => {
-    setAdvanceFilter((prev) => {
-      return {
-        ...prev,
-        lat: userLocation?.lat,
-        lng: userLocation?.lng,
-      };
 
-    })
-    fetchOffice();
-    axiosI.get("/wishlist").then((res) => {
-      setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
-    });
-  }, [filter, userLocation]);
   const toggleWishlist = (id) => {
-    console.log("Toggling wishlist for: ", id);
-
     const isWishlisted = wishlist.includes(id);
-    console.log("isWishlisted: ", isWishlisted);
 
     axiosI
       .post("/wishlist/toggle", { itemId: id, itemType: "Office" })
@@ -144,21 +146,6 @@ function OfficePage() {
         console.error("Error toggling wishlist: ", err);
       });
   };
-
-  // useEffect(() => {
-  //   const filtered = OfficeList.filter((office) => {
-  //     return (
-  //       office.officeName.toLowerCase().includes(filter.toLowerCase()) ||
-  //       office.location.toLowerCase().includes(filter.toLowerCase())
-  //     );
-  //   });
-  //   const sorted = filtered.sort((a, b) => {
-  //     if (b.uid.isFeatureListing && !a.uid.isFeatureListing) return 1;
-  //     if (a.uid.isFeatureListing && !b.uid.isFeatureListing) return -1;
-  //     return 0;
-  //   });
-  //   setFilteredOfficeList(sorted);
-  // }, [filter, OfficeList]);
 
   return (
     <>
@@ -374,23 +361,29 @@ function OfficePage() {
               {/* Grid Container */}
               <div>
                 <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {OfficeList.map((office, index) => (
-                    <div key={index}>
-                      <ProductCard
-                        title={office.title}
-                        desc={office.description}
-                        img={office.images[0]}
-                        price={office.monthlyMaintenance}
-                        location={office.location}
-                        link={`/office/${office._id}`}
-                        verified={office.uid.verified}
-                        isFeatureListing={office.uid.isFeatureListing}
-                        isWishlisted={wishlist.includes(office._id)}
-                        toggleWishlist={() => toggleWishlist(office._id)}
-                        distance={office.distance}
-                      />
+                  {OfficeList.length > 0 ? (
+                    OfficeList.map((office, index) => (
+                      <div key={index}>
+                        <ProductCard
+                          title={office.title}
+                          desc={office.description}
+                          img={office.images[0]}
+                          price={office.monthlyMaintenance}
+                          location={office.location}
+                          link={`/office/${office._id}`}
+                          verified={office.uid.verified}
+                          isFeatureListing={office.uid.isFeatureListing}
+                          isWishlisted={wishlist.includes(office._id)}
+                          toggleWishlist={() => toggleWishlist(office._id)}
+                          distance={office.distance}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-2xl font-bold">
+                      No Office Found
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>

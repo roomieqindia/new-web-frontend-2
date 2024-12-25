@@ -12,6 +12,7 @@ import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
 import PriceRangeSlider from "../components/PriceRangeSlider";
 import ProductCard from "./Demo";
+import Overlay from "../components/Overlay";
 
 function BhojnalayasPage() {
   const [BhojnalayasList, setBhojnalayasList] = useState([]);
@@ -29,11 +30,40 @@ function BhojnalayasPage() {
       min: 0,
       max: 0,
     },
+    priceOfThali: {
+      min: 0,
+      max: 0,
+    },
     parcelOfFood: "",
     veg: "",
     lat: userLocation?.lat,
     lng: userLocation?.lng,
   });
+  const [location, setLocation] = useState(localStorage.getItem("location"));
+
+  useEffect(() => {
+    if (location) {
+      localStorage.setItem("location", location);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    fetchLocation();
+  }, []);
+
+  useEffect(() => {
+    setAdvanceFilter((prev) => {
+      return {
+        ...prev,
+        lat: userLocation?.lat,
+        lng: userLocation?.lng,
+      };
+    });
+    fetchBhojnalayas();
+    axiosI.get("/wishlist").then((res) => {
+      setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
+    });
+  }, [filter, userLocation]);
   const handleFilter = async () => {
     // Filter rooms with advanceFilter
     const { data } = await axiosI.post("/filter/bhojnalaya", advanceFilter);
@@ -77,40 +107,41 @@ function BhojnalayasPage() {
       },
     }));
   };
+  const handlePriceOfThali = (range) => {
+    setAdvanceFilter((prev) => ({
+      ...prev,
+      priceOfThali: {
+        min: range[0],
+        max: range[1],
+      },
+    }));
+  };
 
-  const fetchBhojnalayas = () => {
-    axiosI
-      .get("/bhojnalayas", {
+  const fetchBhojnalayas = async () => {
+    if (!userLocation) return;
+    setLoading(true);
+    try {
+      const { data } = await axiosI.get("/bhojnalayas", {
         params: {
           filter,
           lat: userLocation?.lat,
           lng: userLocation?.lng,
         },
-      })
-      .then((res) => {
-        setBhojnalayasList(res.data);
-        setLoading(false);
       });
+      setBhojnalayasList(data);
+      if (data) {
+        const res = await axiosI.get("/wishlist");
+        setWishlist(
+          Array.isArray(res?.data?.itemIds) ? res?.data?.itemIds : []
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
-    fetchLocation();
-  }, []);
-
-  useEffect(() => {
-    setAdvanceFilter((prev) => {
-      return {
-        ...prev,
-        lat: userLocation?.lat,
-        lng: userLocation?.lng,
-      };
-
-    })
-    fetchBhojnalayas();
-    axiosI.get("/wishlist").then((res) => {
-      setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
-    });
-  }, [filter, userLocation]);
   const toggleWishlist = (id) => {
     console.log("Toggling wishlist for: ", id);
 
@@ -131,25 +162,11 @@ function BhojnalayasPage() {
       });
   };
 
-  // useEffect(() => {
-  //   const filtered = BhojnalayasList.filter((room) => {
-  //     return (
-  //       room.bhojanalayName.toLowerCase().includes(filter.toLowerCase()) ||
-  //       room.location.toLowerCase().includes(filter.toLowerCase())
-  //     );
-  //   });
-  //   const sorted = filtered.sort((a, b) => {
-  //     if (b.uid.isFeatureListing && !a.uid.isFeatureListing) return 1;
-  //     if (a.uid.isFeatureListing && !b.uid.isFeatureListing) return -1;
-  //     return 0;
-  //   });
-
-  //   setFilteredBhojnalayasList(sorted);
-  // }, [filter, BhojnalayasList]);
-
   return (
     <>
       <Navbar />
+      {!location && <Overlay setLocation={setLocation} location={location} />}
+
       <div className="mb-[20px]">
         <div className="relative bg-white overflow-hidden h-auto pt-8">
           {/* Background Houses */}
@@ -199,19 +216,17 @@ function BhojnalayasPage() {
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
               Home \ Bhojnalayas
             </p>
-            <div className="flex items-center w-full sm:w-[350px] bg-white border border-black shadow-md rounded-full px-4 py-2">
-              <img
-                src={Filter}
-                alt="Filter Icon"
-                className="h-5 sm:h-6 w-5 sm:w-6"
-              />
-              <input
-                type="text"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                placeholder="Filter by name, location..."
-                className="w-full bg-transparent focus:outline-none placeholder-gray-500 ml-2"
-              />
+            <div className="flex items-center bg-white gap-4">
+              {location?.split(",").slice(0, 3).join(", ")}
+              <button
+                className="text-gray-500 hover:text-white bg-gray-100 hover:bg-slate-500 px-3 py-1 border border-gray-500 rounded-md transition duration-200"
+                onClick={() => {
+                  localStorage.removeItem("location");
+                  setLocation(null);
+                }}
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
@@ -257,6 +272,21 @@ function BhojnalayasPage() {
                       step={50}
                       defaultValue={[0, 20000]}
                       onRangeChange={handleMonthlyCharge2Change}
+                    />
+                  </div>
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Price Range Slider with Min-Max Input */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Price Of Thali</label>
+                  <label className="text-xs mb-4">Choose a range below</label>
+                  <div className="flex items-center space-x-2">
+                    <PriceRangeSlider
+                      min={0}
+                      max={2000}
+                      step={10}
+                      defaultValue={[0, 2000]}
+                      onRangeChange={handlePriceOfThali}
                     />
                   </div>
                 </div>
@@ -341,23 +371,29 @@ function BhojnalayasPage() {
               {/* Grid Container */}
               <div>
                 <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {BhojnalayasList.map((room, index) => (
-                    <div key={index}>
-                      <ProductCard
-                        title={room.bhojanalayName}
-                        desc={room.description}
-                        img={room.images[0]}
-                        price={room.priceOfThali}
-                        location={room.location}
-                        link={`/Bhojnalaya/${room._id}`}
-                        verified={room.uid.verified}
-                        isFeatureListing={room.uid.isFeatureListing}
-                        isWishlisted={wishlist.includes(room._id)}
-                        toggleWishlist={() => toggleWishlist(room._id)}
-                        distance={room.distance}
-                      />
+                  {BhojnalayasList.length > 0 ? (
+                    BhojnalayasList.map((room, index) => (
+                      <div key={index}>
+                        <ProductCard
+                          title={room.bhojanalayName}
+                          desc={room.description}
+                          img={room.images[0]}
+                          price={room.priceOfThali}
+                          location={room.location}
+                          link={`/Bhojnalaya/${room._id}`}
+                          verified={room.uid.verified}
+                          isFeatureListing={room.uid.isFeatureListing}
+                          isWishlisted={wishlist.includes(room._id)}
+                          toggleWishlist={() => toggleWishlist(room._id)}
+                          distance={room.distance}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-2xl font-bold">
+                      No Bhojnalayas Found
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>

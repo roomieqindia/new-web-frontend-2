@@ -55,7 +55,7 @@ import Demo from "./pages/Demo";
 // import Cards from "./components/cards";
 
 export default function App() {
-  const { checkAuth, onlineUsers } = useAuthStore();
+  const { checkAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
@@ -78,7 +78,6 @@ export default function App() {
         <Route path="/bhojanalayas" element={<BhojnalayasPage />} />
         <Route path="/blogs" element={<BlogPage />} />
         <Route path="/blogs/:id" element={<BlogSubPage />} />
-        {/* <Route path="/cat1" element={<Cat1 />} /> */}
         <Route path="/cat" element={<Cat />} />
         <Route path="/citypage" element={<CityPage />} />
         <Route path="/career" element={<CareerWithUS />} />
@@ -110,11 +109,11 @@ export default function App() {
         <Route path="/wishlist" element={<WishList />} />
         <Route path="/demo" element={<Demo />} />
 
+        {/* <Route path="/cat1" element={<Cat1 />} /> */}
         {/* <Route path="/cat2" element={<Cat2 />} /> */}
         {/* <Route path="/otp2" element={<OTP2 />} /> */}
         {/* <Route path="/privacypolicy" element={<PrivacyPolicy />} /> */}
         {/* <Route path="/Bot" element={<Bot />} /> */}
-
         {/* <Route path="/cards" element={<Cards />} /> */}
       </Routes>
     </Router>

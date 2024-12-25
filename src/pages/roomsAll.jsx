@@ -1,7 +1,5 @@
-import GridCardLike from "../components/CardLike";
 import Category from "../assets/category.svg";
 import House from "../assets/House.svg";
-import Filter from "../assets/filter.png";
 import Footer from "../components/footer";
 import PriceRangeSlider from "../components/PriceRangeSlider";
 import AppStore from "../assets/AppStore.svg";
@@ -11,11 +9,8 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { axiosI } from "../axios";
 import { useLocation } from "../../utils/LocationContext";
-import Card from "../components/Card";
 import Overlay from "../components/Overlay";
-import Demo from "./Demo";
 import ProductCard from "./Demo";
-import { set } from "react-hook-form";
 
 function RoomsPage() {
   const { userLocation, fetchLocation } = useLocation();
@@ -23,7 +18,6 @@ function RoomsPage() {
   const [wishlist, setWishlist] = useState([]);
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
-  const [location, setLocation] = useState(null);
   const [advanceFilter, setAdvanceFilter] = useState({
     priceRange: {
       min: 0,
@@ -42,17 +36,13 @@ function RoomsPage() {
     lat: userLocation?.lat,
     lng: userLocation?.lng,
   });
+  const [location, setLocation] = useState(localStorage.getItem("location"));
 
   useEffect(() => {
     if (location) {
       localStorage.setItem("location", location);
     }
-    setLoading(false);
   }, [location]);
-  useEffect(() => {
-    const l = localStorage.getItem("location");
-    setLocation(l);
-  }, []);
 
   useEffect(() => {
     setAdvanceFilter((prev) => {
@@ -63,34 +53,36 @@ function RoomsPage() {
       };
     });
     fetchRooms();
-    fetchWishlist();
   }, [filter, userLocation]);
 
   useEffect(() => {
     fetchLocation();
   }, []);
 
-  const fetchRooms = () => {
-    axiosI
-      .get("/rooms", {
+  const fetchRooms = async () => {
+    if (!userLocation) return;
+    setLoading(true);
+
+    try {
+      const { data } = await axiosI.get("/rooms", {
         params: {
           filter,
           lat: userLocation?.lat,
           lng: userLocation?.lng,
         },
-      })
-      .then((res) => {
-        setRoomList(res.data);
-        console.log(res.data);
-
-        setLoading(false);
       });
-  };
-
-  const fetchWishlist = () => {
-    axiosI.get("/wishlist").then((res) => {
-      setWishlist(Array.isArray(res.data.itemIds) ? res.data.itemIds : []);
-    });
+      setRoomList(data);
+      if (data) {
+        const res = await axiosI.get("/wishlist");
+        setWishlist(
+          Array.isArray(res?.data?.itemIds) ? res?.data?.itemIds : []
+        );
+      }
+    } catch (err) {
+      console.error("Error fetching rooms: ", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleWishlist = (id) => {
@@ -115,9 +107,10 @@ function RoomsPage() {
 
   const handleFilter = async () => {
     // Filter rooms with advanceFilter
+    setLoading(true);
     const { data } = await axiosI.post("/filter/rooms", advanceFilter);
     setRoomList(data);
-    console.log(data);
+    setLoading(false);
   };
 
   const handleClearFilter = () => {
@@ -151,11 +144,15 @@ function RoomsPage() {
       },
     }));
   };
+
+  const handleToggleFilter = () => {
+    document.querySelector(".filter-cnt").classList.toggle("hidden");
+  }
+
   return (
     <>
       <Navbar />
       {!location && <Overlay setLocation={setLocation} location={location} />}
-
       <div className="mb-[20px]">
         <div className="relative bg-white overflow-hidden h-auto pt-8">
           {/* Background Houses */}
@@ -221,262 +218,285 @@ function RoomsPage() {
         </div>
         <div className="bg-black mx-auto w-[85%] sm:w-[94%] h-[1px] ml-[6] mt-3"></div>
       </div>
+      {/* filter button for mobile screen */}
+      <div className="flex justify-center items-center sm:hidden">
+        <button
+          className="bg-black text-white px-4 py-2 rounded-lg"
+          onClick={handleToggleFilter}
+        >
+          Filter
+        </button>
+      </div>
       <>
-        <div className="px-4">
-          <div className="font-poppins py-6 flex gap-2">
-            {/* advance Filter */}
-            <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt">
-              <div className="text-2xl text-center w-full">
-                FILTERS & SORTING
-              </div>
-              {/* divider */}
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* Price Range Slider with Min-Max Input */}
-              <div className="flex flex-col space">
-                <label className="text-lg">By Budget</label>
-                <label className="text-xs mb-4">Choose a range below</label>
-                <div className="flex items-center space-x-2">
-                  <PriceRangeSlider
-                    min={0}
-                    max={100000}
-                    step={100}
-                    defaultValue={[0, 100000]}
-                    onRangeChange={handlePriceRangeChange}
-                  />
+        {loading ? (
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-500"></div>
+          </div>
+        ) : (
+          <div className="px-4">
+            <div className="font-poppins py-6 flex gap-2">
+              {/* advance Filter */}
+              <div className="flex flex-col mx-6 w-1/5 border-[.5px] p-4 rounded-lg border-gray-900 filter-cnt  sm:block">
+                <div className="text-2xl text-center w-full">
+                  FILTERS & SORTING
                 </div>
-              </div>
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* By Bedrooms */}
-              <div className="flex flex-col space">
-                <label className="text-lg">By Bedrooms</label>
-                <label className="text-xs mb-4">
-                  Choose from below options
-                </label>
-                {["1BHK", "2BHK", "3BHK", "4BHK", "4+BHK"].map((e) => (
-                  <div
-                    className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
-                      advanceFilter.bedrooms === e
-                        ? "bg-[#bedbfe] border-blue-500"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      setAdvanceFilter((prev) => ({ ...prev, bedrooms: e }))
-                    }
-                    key={e}
-                  >
-                    {e}
-                  </div>
-                ))}
-              </div>
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* By Bathroom */}
-              <div className="flex flex-col space">
-                <label className="text-lg">By Bathroom</label>
-                <label className="text-xs mb-4">
-                  Choose from below options
-                </label>
-                {/* set active also */}
-                {["1 Bathroom", "2 Bathrooms", "3 Bathrooms"].map((e) => (
-                  <div
-                    className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
-                      advanceFilter.bathroom === e
-                        ? "bg-[#bedbfe] border-blue-500"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      setAdvanceFilter((prev) => ({ ...prev, bathroom: e }))
-                    }
-                    key={e}
-                  >
-                    {e}
-                  </div>
-                ))}
-              </div>
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* By Furnishing checkbox */}
-              <div className="flex flex-col space">
-                <label className="text-lg">By Furnishing</label>
-                <label className="text-xs mb-4">
-                  Choose from below options
-                </label>
-                {["Furnished", "Semi-Furnished", "Unfurnished"].map((e) => (
-                  <div className="p-2 px-4  mb-3" key={e}>
-                    <input
-                      type="checkbox"
-                      onClick={() =>
-                        setAdvanceFilter((prev) => ({
-                          ...prev,
-                          furnishing: [...prev.furnishing, e],
-                        }))
-                      }
-                      className="mr-2"
+                {/* divider */}
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Price Range Slider with Min-Max Input */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Budget</label>
+                  <label className="text-xs mb-4">Choose a range below</label>
+                  <div className="flex items-center space-x-2">
+                    <PriceRangeSlider
+                      min={0}
+                      max={100000}
+                      step={100}
+                      defaultValue={[0, 100000]}
+                      onRangeChange={handlePriceRangeChange}
                     />
+                  </div>
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* By Bedrooms */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Bedrooms</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["1BHK", "2BHK", "3BHK", "4BHK", "4+BHK"].map((e) => (
+                    <div
+                      className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
+                        advanceFilter.bedrooms === e
+                          ? "bg-[#bedbfe] border-blue-500"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setAdvanceFilter((prev) => ({ ...prev, bedrooms: e }))
+                      }
+                      key={e}
+                    >
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* By Bathroom */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Bathroom</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {/* set active also */}
+                  {["1 Bathroom", "2 Bathrooms", "3 Bathrooms"].map((e) => (
+                    <div
+                      className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer ${
+                        advanceFilter.bathroom === e
+                          ? "bg-[#bedbfe] border-blue-500"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setAdvanceFilter((prev) => ({ ...prev, bathroom: e }))
+                      }
+                      key={e}
+                    >
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* By Furnishing checkbox */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Furnishing</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["Furnished", "Semi-Furnished", "Unfurnished"].map((e) => (
+                    <div className="p-2 px-4  mb-3" key={e}>
+                      <input
+                        type="checkbox"
+                        onClick={() =>
+                          setAdvanceFilter((prev) => ({
+                            ...prev,
+                            furnishing: [...prev.furnishing, e],
+                          }))
+                        }
+                        className="mr-2"
+                      />
 
-                    {e}
-                  </div>
-                ))}
-              </div>
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* By Listed checkbox */}
-              <div className="flex flex-col space">
-                <label className="text-lg">Listed By</label>
-                <label className="text-xs mb-4">
-                  Choose from below options
-                </label>
-                {["Owner", "Tenant / Rental"].map((e) => (
-                  <div className="p-2 px-4  mb-3" key={e}>
-                    <input
-                      type="checkbox"
-                      onClick={() =>
-                        setAdvanceFilter((prev) => ({
-                          ...prev,
-                          listedBy: [...prev.listedBy, e],
-                        }))
-                      }
-                      className="mr-2"
-                    />
-                    {e}
-                  </div>
-                ))}
-              </div>
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* By Bachelors */}
-              <div className="flex flex-col space">
-                <label className="text-lg">By Bachelors</label>
-                <label className="text-xs mb-4">
-                  Choose from below options
-                </label>
-                {["Yes ", "No"].map((e) => (
-                  <div
-                    className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* By Listed checkbox */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">Listed By</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["Owner", "Tenant / Rental"].map((e) => (
+                    <div className="p-2 px-4  mb-3" key={e}>
+                      <input
+                        type="checkbox"
+                        onClick={() =>
+                          setAdvanceFilter((prev) => ({
+                            ...prev,
+                            listedBy: [...prev.listedBy, e],
+                          }))
+                        }
+                        className="mr-2"
+                      />
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* By Bachelors */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">By Bachelors</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {["Yes ", "No"].map((e) => (
+                    <div
+                      className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer
                     ${
                       advanceFilter.bachelors === e
                         ? "bg-[#bedbfe] border-blue-500"
                         : ""
                     }`}
-                    onClick={() =>
-                      setAdvanceFilter((prev) => ({ ...prev, bachelors: e }))
-                    }
-                    key={e}
-                  >
-                    {e}
-                  </div>
-                ))}
-              </div>
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* Price per Sqft min max slider */}
-              <div className="flex flex-col space">
-                <label className="text-lg">Price per Sqft</label>
-                <label className="text-xs mb-4">Choose a range below</label>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    className="w-1/2 border-[.5px] p-1 rounded-md"
-                    onChange={(e) =>
-                      setAdvanceFilter((prev) => ({
-                        ...prev,
-                        pricePerSqft: {
-                          ...prev.pricePerSqft,
-                          min: +e.target.value,
-                        },
-                      }))
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    className="w-1/2 border-[.5px] p-1 rounded-md"
-                    onChange={(e) =>
-                      setAdvanceFilter((prev) => ({
-                        ...prev,
-                        pricePerSqft: {
-                          ...prev.pricePerSqft,
-                          max: +e.target.value,
-                        },
-                      }))
-                    }
-                  />
+                      onClick={() =>
+                        setAdvanceFilter((prev) => ({ ...prev, bachelors: e }))
+                      }
+                      key={e}
+                    >
+                      {e}
+                    </div>
+                  ))}
                 </div>
-              </div>
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* Sort By */}
-              <div className="flex flex-col space">
-                <label className="text-lg">Sort By</label>
-                <label className="text-xs mb-4">
-                  Choose from below options
-                </label>
-                {[
-                  "Price: Low to High",
-                  "Price: High to Low",
-                  "Featured & Verified Listing",
-                ].map((e) => (
-                  <div
-                    className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Price per Sqft min max slider */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">Price per Sqft</label>
+                  <label className="text-xs mb-4">Choose a range below</label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      placeholder="Min"
+                      className="w-1/2 border-[.5px] p-1 rounded-md"
+                      onChange={(e) =>
+                        setAdvanceFilter((prev) => ({
+                          ...prev,
+                          pricePerSqft: {
+                            ...prev.pricePerSqft,
+                            min: +e.target.value,
+                          },
+                        }))
+                      }
+                    />
+                    <input
+                      type="number"
+                      placeholder="Max"
+                      className="w-1/2 border-[.5px] p-1 rounded-md"
+                      onChange={(e) =>
+                        setAdvanceFilter((prev) => ({
+                          ...prev,
+                          pricePerSqft: {
+                            ...prev.pricePerSqft,
+                            max: +e.target.value,
+                          },
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Sort By */}
+                <div className="flex flex-col space">
+                  <label className="text-lg">Sort By</label>
+                  <label className="text-xs mb-4">
+                    Choose from below options
+                  </label>
+                  {[
+                    "Price: Low to High",
+                    "Price: High to Low",
+                    "Featured & Verified Listing",
+                  ].map((e) => (
+                    <div
+                      className={`p-2 px-4 border-[.5px] border-gray-950 mb-3 rounded-lg hover:border-blue-500 cursor-pointer
                     ${
                       advanceFilter.sortBy === e
                         ? "bg-[#bedbfe] border-blue-500"
                         : ""
                     }`}
-                    onClick={() =>
-                      setAdvanceFilter((prev) => ({ ...prev, sortBy: e }))
-                    }
-                    key={e}
+                      onClick={() =>
+                        setAdvanceFilter((prev) => ({ ...prev, sortBy: e }))
+                      }
+                      key={e}
+                    >
+                      {e}
+                    </div>
+                  ))}
+                </div>
+                <div className="border-b border-gray-400 my-2"></div>
+                {/* Buttons */}
+                <div className="flex justify-between mt-4">
+                  <button
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
+                    onClick={() => {
+                      handleClearFilter();
+                      document
+                        .querySelector(".card-section")
+                        .scrollIntoView({ behavior: "smooth" });
+                    }}
                   >
-                    {e}
-                  </div>
-                ))}
+                    Clear
+                  </button>
+                  <button
+                    // add transition of .5s
+                    className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
+                    onClick={() => {
+                      handleFilter();
+                      document
+                        .querySelector(".card-section")
+                        .scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    Apply
+                  </button>
+                </div>
               </div>
-              <div className="border-b border-gray-400 my-2"></div>
-              {/* Buttons */}
-              <div className="flex justify-between mt-4">
-                <button
-                  className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
-                  onClick={() => {
-                    handleClearFilter();
-                    document
-                      .querySelector(".card-section")
-                      .scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  Clear
-                </button>
-                <button
-                  // add transition of .5s
-                  className="py-2 px-5 rounded-lg border-[.5px] border-black active:bg-[#bedbfe] active:scale-95 transform transition-transform"
-                  onClick={() => {
-                    handleFilter();
-                    document
-                      .querySelector(".card-section")
-                      .scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
 
-            <div>
-              <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {roomList.map((room, index) => (
-                  <ProductCard
-                    title={room.roomName}
-                    desc={room.description}
-                    img={room.images?.[0]} // Safe navigation for images array
-                    price={room.monthlyMaintenance}
-                    location={room.location}
-                    link={`/room/${room._id}`}
-                    verified={room.uid?.verified || false}
-                    isFeatureListing={room.uid?.isFeatureListing}
-                    isWishlisted={wishlist.includes(room._id)}
-                    toggleWishlist={() => toggleWishlist(room._id)}
-                    distance={room.distance}
-                  />
-                ))}
+              <div>
+                <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {roomList.length > 0 ? (
+                    roomList.map((room, index) => (
+                      <div key={index}>
+                        <ProductCard
+                          title={room.roomName}
+                          desc={room.description || "No Description"}
+                          img={room.images?.[0]} // Safe navigation for images array
+                          price={room.monthlyMaintenance}
+                          location={room.location}
+                          link={`/room/${room._id}`}
+                          verified={room.uid?.verified || false}
+                          isFeatureListing={room.uid?.isFeatureListing}
+                          isWishlisted={wishlist.includes(room._id)}
+                          toggleWishlist={() => toggleWishlist(room._id)}
+                          distance={room.distance}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-2xl font-bold">
+                      No Rooms Found
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </>
 
       {/* Eighth Division  */}
