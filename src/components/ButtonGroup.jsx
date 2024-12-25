@@ -34,10 +34,16 @@ function ButtonGroup({
               selectedValue === option
                 ? "bg-white ring-2 ring-purple-200"
                 : "bg-transparent ring-1 ring-gray-500"
-            } p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 hover:bg-white transition-colors 
-              drop-shadow-2xl
-            `}
+            } p-4 rounded-lg   hover:bg-white hover:ring-2 hover:ring-purple-200  transition-colors `}
             // add shadow
+            style={{
+              boxShadow:
+                selectedValue === option
+                  ? "4px 4px 10px 0px #e9d5ff"
+                  : "4px 4px 10px 0px #4f4f4f",
+              borderWidth: selectedValue === option ? "2px" : "1px",
+              borderColor: selectedValue === option ? "#e9d5ff" : "#4f4f4f",
+            }}
           >
             {option}
           </button>
