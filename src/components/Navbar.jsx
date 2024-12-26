@@ -38,6 +38,8 @@ function Navbar({ isFilterVisible }) {
       setUserMembership(userData.membership);
       setListingsCount(userData.listingsCount);
       setMembershipExpiry(userData.membershipExpiry);
+      console.log("User Data:", userData);
+      
     }
   }, [userData]);
 
@@ -284,7 +286,7 @@ const ProfileDropdown = ({
       >
         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden">
           <img
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+            src={userData.profilePic || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
             alt="Profile"
             className="object-cover w-full h-full"
           />
@@ -313,7 +315,7 @@ const ProfileDropdown = ({
             <div className="flex justify-between items-center">
               <div className="w-20 h-20 rounded-full overflow-hidden">
                 <img
-                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                  src={userData.profilePic || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
                   alt="profile image"
                   className="object-cover w-full h-full"
                 />

@@ -73,11 +73,14 @@ const Login = ({ setLoginVisible }) => {
             },
           }
         );
-        const { name, email } = res.data;
+        console.log(res.data);
+        
+        const { name, email, picture } = res.data;
 
         const { data } = await axiosI.post("/google-login", {
           name,
           email,
+          picture
         });
 
         if (data.success) {

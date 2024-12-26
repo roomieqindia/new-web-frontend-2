@@ -41,6 +41,7 @@ function BhojnalayasPage() {
     lng: userLocation?.lng,
   });
   const [location, setLocation] = useState(localStorage.getItem("location"));
+  const [visibleItems, setVisibleItems] = useState(8);
 
   useEffect(() => {
     if (location) {
@@ -66,13 +67,15 @@ function BhojnalayasPage() {
     });
   }, [filter, userLocation]);
   const handleFilter = async () => {
-    // Filter rooms with advanceFilter
+    setVisibleItems(8); // Reset when filtering
     const { data } = await axiosI.post("/filter/bhojnalaya", advanceFilter);
     setBhojnalayasList(data);
     console.log(data);
   };
 
   const handleClearFilter = () => {
+    setVisibleItems(8); // Reset when clearing filter
+
     setAdvanceFilter({
       monthlyCharge1: {
         min: 0,
@@ -166,12 +169,16 @@ function BhojnalayasPage() {
     setIsFilterVisible(!isFilterVisible);
   };
 
+  const loadMore = () => {
+    setVisibleItems((prev) => prev + 8);
+  };
+
   return (
     <>
-      <Navbar />
+      <Navbar isFilterVisible={isFilterVisible} />
       {!location && <Overlay setLocation={setLocation} location={location} />}
-
-      <div className="mb-[20px]">
+      <div className={`mb-[20px] ${isFilterVisible ? "blur-sm" : ""}`}>
+        {/* Header section */}
         <div className="relative bg-white overflow-hidden h-auto pt-8">
           {/* Background Houses */}
           <img
@@ -216,47 +223,65 @@ function BhojnalayasPage() {
           </div>
 
           {/* Footer Section */}
-          <div className="card-section relative z-50 -mt-20 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-16 py-8 space-y-4 sm:space-y-0">
+          <div className="card-section relative z-10 -mt-20 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-16 py-4 space-y-4 sm:space-y-0 sm:w-full">
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
-              Home \ Bhojnalayas
+              Home \ Bhojanalayas
             </p>
-            <div className="flex items-center bg-white gap-4">
-              {location?.split(",").slice(0, 3).join(", ")}
-              <button
-                className="text-gray-500 hover:text-white bg-gray-100 hover:bg-slate-500 px-3 py-1 border border-gray-500 rounded-md transition duration-200"
+            <div className="flex items-center bg-white gap-4 justify-between px-3 pt-8 max-xs:w-full cursor-pointer">
+              <span
                 onClick={() => {
                   localStorage.removeItem("location");
                   setLocation(null);
                 }}
               >
-                Reset
+                {location && location.length > 20
+                  ? location?.slice(0, 25) + "..."
+                  : location}
+              </span>
+              <button className="sm:hidden" onClick={handleToggleFilter}>
+                <img src="filter.svg" className="w-6 h-6" alt="" />
               </button>
             </div>
           </div>
         </div>
-        <div className="bg-black mx-auto w-[85%] sm:w-[94%] h-[1px] ml-[6] mt-3"></div>
+        <div className="bg-black mx-auto w-[85%] sm:w-[94%] h-[1px] ml-[6] mt-1"></div>
       </div>
-      <div className="flex justify-end items-center sm:hidden mb-4">
-        <button onClick={handleToggleFilter}>open filter</button>
-      </div>
+
       {loading ? (
         <div className="flex justify-center py-4">
           <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-500"></div>
         </div>
       ) : (
-        <>
-          <div className="px-4">
-            <div className="font-poppins py-6 flex gap-2">
-              <div className={`fixed inset-y-0 left-[-24px] top-[66px] z-50 w-full bg-white shadow-lg transform ${isFilterVisible ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0 sm:w-1/5 sm:shadow-none flex flex-col mx-6 border-[.5px] p-4 rounded-lg border-gray-900 overflow-y-auto`}>
-              <button 
-                  className="sm:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                  onClick={handleToggleFilter}
+        <div className="px-4">
+          <div className="font-poppins py-6 flex gap-2">
+            {/* Filter Panel */}
+            <div
+              className={`fixed inset-x-0 bottom-0 z-50 w-full h-[80vh] bg-white shadow-lg transform ${
+                isFilterVisible ? "translate-y-0" : "translate-y-full"
+              } transition-transform duration-300 ease-in-out sm:relative sm:translate-y-0 sm:w-1/5 sm:h-auto sm:shadow-none flex flex-col sm:mx-6 border-t-[.5px] sm:border-[.5px] p-4 sm:rounded-lg border-gray-900 overflow-y-auto`}
+            >
+              <button
+                className="sm:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                onClick={handleToggleFilter}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                <div className="text-2xl text-center w-full">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+              
+              {/* Filter Content */}
+              <div className="text-2xl text-center w-full">
                   FILTERS & SORTING
                 </div>
                 {/* divider */}
@@ -386,47 +411,58 @@ function BhojnalayasPage() {
                     Apply
                   </button>
                 </div>
-              </div>
-              {/* Grid Container */}
-              <div>
-                <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {BhojnalayasList.length > 0 ? (
-                    BhojnalayasList.map((room, index) => (
+            </div>
+
+            {/* Bhojanalaya Cards */}
+            <div className={isFilterVisible ? "blur-sm" : ""}>
+              <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {BhojnalayasList.length > 0 ? (
+                  <>
+                    {BhojnalayasList.slice(0, visibleItems).map((bhojnalaya, index) => (
                       <div key={index}>
                         <ProductCard
-                          title={room.bhojanalayName}
-                          desc={room.description}
-                          img={room.images[0]}
-                          price={room.priceOfThali}
-                          location={room.location}
-                          link={`/Bhojnalaya/${room._id}`}
-                          verified={room.uid.verified}
-                          isFeatureListing={room.uid.isFeatureListing}
-                          isWishlisted={wishlist.includes(room._id)}
-                          toggleWishlist={() => toggleWishlist(room._id)}
-                          distance={room.distance}
+                          title={bhojnalaya.bhojanalayName}
+                          desc={bhojnalaya.description}
+                          img={bhojnalaya.images[0]}
+                          price={bhojnalaya.priceOfThali}
+                          location={bhojnalaya.location}
+                          link={`/Bhojnalaya/${bhojnalaya._id}`}
+                          verified={bhojnalaya.uid.verified}
+                          isFeatureListing={bhojnalaya.uid.isFeatureListing}
+                          isWishlisted={wishlist.includes(bhojnalaya._id)}
+                          toggleWishlist={() => toggleWishlist(bhojnalaya._id)}
+                          distance={bhojnalaya.distance}
                         />
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center text-2xl font-bold">
-                      No Bhojnalayas Found
-                    </div>
-                  )}
-                </div>
+                    ))}
+                    {visibleItems < BhojnalayasList.length && (
+                      <div className="col-span-full flex justify-center mt-4">
+                        <button
+                          onClick={loadMore}
+                          className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                        >
+                          Show More
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center text-2xl font-bold">
+                    No Bhojnalayas Found
+                  </div>
+                )}
               </div>
             </div>
           </div>
-          {/* <div className="w-full text-center">
-            <button className="mt-[40px] bg-[#e4c1f9] w-[220px] sm:w-[370px] h-[60px] sm:h-[90px] rounded-[60px] font-normal text-lg sm:text-2xl border-b-4 border-gray-400 mb-[60px]">
-              View More Properties...
-            </button>
-          </div> */}
-        </>
+        </div>
       )}
 
-      {/* Eighth Division  */}
-      <div className="bg-[#f8f8f8] flex flex-col items-center justify-center py-12 px-4 sm:px-8 lg:flex-row lg:py-16">
+      {/* App Download Section */}
+      <div
+        className={`bg-[#f8f8f8] flex flex-col items-center justify-center py-12 px-4 sm:px-8 lg:flex-row lg:py-16 ${
+          isFilterVisible ? "blur-sm" : ""
+        }`}
+      >
         {/* Left Section: Text Content */}
         <div className="flex flex-col space-y-6 text-center lg:text-left lg:max-w-md">
           <h2 className="text-black text-2xl sm:text-3xl lg:text-4xl font-medium font-poppins">
@@ -467,7 +503,9 @@ function BhojnalayasPage() {
         </div>
       </div>
 
-      <Footer />
+      <div className={isFilterVisible ? "blur-sm" : ""}>
+        <Footer />
+      </div>
     </>
   );
 }

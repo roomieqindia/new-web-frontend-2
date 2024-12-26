@@ -24,6 +24,7 @@ import { useChatStore } from "../../utils/useChatStore";
 import { useAuth } from "../../utils/contextLogin";
 import { toast } from "react-toastify";
 import { axiosI } from "../axios";
+import ProductCard from "./Demo";
 const RoomListingPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const RoomListingPage = () => {
   const [relatedOffices, setRelatedOffices] = useState([]);
   const [chatSelected, setChatSelected] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [wishlist, setWishlist] = useState([]);
   const amenitiesList = [
     { id: 1, label: "Gym", icon: fitness },
     { id: 2, label: "Park", icon: travel },
@@ -59,6 +61,12 @@ const RoomListingPage = () => {
         const res = await axiosI.get(`/rooms/${id}`);
         setRelatedOffices(response.data.filter((item) => item._id !== id));
         setOfficeData(res.data);
+        if (res.data) {
+          const res = await axiosI.get("/wishlist");
+          setWishlist(
+            Array.isArray(res?.data?.itemIds) ? res?.data?.itemIds : []
+          );
+        }
       } catch (error) {
         console.error("Error fetching office data:", error);
       } finally {
@@ -67,6 +75,25 @@ const RoomListingPage = () => {
     };
     fetchOfficeData();
   }, [id]);
+  const toggleWishlist = (id) => {
+    console.log("Toggling wishlist for: ", id);
+
+    const isWishlisted = wishlist.includes(id);
+    console.log("isWishlisted: ", isWishlisted);
+
+    axiosI
+      .post("/wishlist/toggle", { itemId: id, itemType: "RoomForm" })
+      .then((res) => {
+        if (isWishlisted) {
+          setWishlist((prev) => prev.filter((item) => item !== id));
+        } else {
+          setWishlist((prev) => [...prev, id]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error toggling wishlist: ", err);
+      });
+  };
 
   const handleChat = (uid) => {
     if (userData._id === uid._id) {
@@ -140,7 +167,7 @@ const RoomListingPage = () => {
     } else {
       console.log("Web Share API not supported");
     }
-  }
+  };
   return (
     <>
       <Navbar />
@@ -256,7 +283,12 @@ const RoomListingPage = () => {
                 </p>
                 <div className="flex gap-2">
                   <img src={vectorIcon} alt="Icon" className="w-8 h-8" />
-                  <img src={verctrIcon} onClick={handleShare}  alt="Icon" className="w-8 h-8 cursor-pointer" />
+                  <img
+                    src={verctrIcon}
+                    onClick={handleShare}
+                    alt="Icon"
+                    className="w-8 h-8 cursor-pointer"
+                  />
                 </div>
               </div>
               <div className="text-center">
@@ -311,18 +343,23 @@ const RoomListingPage = () => {
           <h2 className="text-2xl mb-8 md:text-4xl font-poppins text-center mx-auto font-semibold ">
             Related Search
           </h2>
+          
           <div className="slider-container py-4 pb-14 relative w-full overflow-hidden">
             {relatedOffices.length > 0 ? (
               <Slider {...settings2}>
                 {relatedOffices.map((room, index) => (
                   <div key={index} className="px-4 max-w-[500px]">
-                    <GridCardLike
-                      title={room.title}
+                    <ProductCard
+                      title={room.roomName}
                       desc={room.description}
                       img={room.images[0]}
                       price={room.monthlyMaintenance}
                       location={room.location}
                       link={`/room/${room._id}`}
+                      verified={room.uid?.verified || false}
+                      isFeatureListing={room.uid?.isFeatureListing}
+                      isWishlisted={wishlist.includes(room._id)}
+                      toggleWishlist={() => toggleWishlist(room._id)}
                     />
                   </div>
                 ))}

@@ -62,48 +62,60 @@ function LegalNotice() {
   ];
 
   return (
-    <div className="sm:h-[1600px] h-[1200px] relative bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Navbar />
 
-      <div className="min-h-screen py-8 px-4 pt-32">
-        <div className="mx-auto bg-white p-6 rounded-md">
-          <h1 className="text-4xl font-bold text-gray-800 text-center mb-24">
+      <div className="container mx-auto px-4 pt-24 sm:pt-32 pb-16">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 text-center mb-8 sm:mb-12 
+            animate-fade-in-down">
             Legal Notice
           </h1>
-          <p className="text-gray-600 text-2xl mb-24 text-left">
-            This Legal Notice governs your use of the website and mobile
-            application (collectively referred to as "Services") operated by{" "}
-            <b>RoomieQ India</b>. By accessing or using our Services, you agree
-            to comply with the terms outlined below. If you do not agree, please
-            refrain from using our Services.
-          </p>
-
-          {legalSections.map((section, index) => (
-            <div key={index} className="mb-24">
-              <h2 className="text-3xl font-semibold text-gray-800 mb-12">
-                {section.title}
-              </h2>
-              <div className="text-gray-600 text-2xl">{section.content}</div>
-            </div>
-          ))}
-
-          <div>
-            <p className="text-gray-600 text-center">
-              For any questions or concerns regarding this Legal Notice, please
-              contact us at{" "}
-              <a
-                href="mailto:support@roomieqindia.com"
-                className="text-blue-600 underline"
-              >
-                support@roomieqindia.com
-              </a>
-              .
+          
+          <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 md:p-10 mb-8">
+            <p className="text-gray-700 text-lg sm:text-xl mb-12 leading-relaxed transition-all duration-300 
+              hover:text-gray-900">
+              This Legal Notice governs your use of the website and mobile
+              application (collectively referred to as "Services") operated by{" "}
+              <span className="font-semibold text-blue-600">RoomieQ India</span>. 
+              By accessing or using our Services, you agree to comply with the terms 
+              outlined below. If you do not agree, please refrain from using our Services.
             </p>
+
+            {legalSections.map((section, index) => (
+              <div key={index} 
+                className="mb-12 transform transition-all duration-300 hover:translate-x-2">
+                <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-4 
+                  border-l-4 border-blue-500 pl-4">
+                  {section.title}
+                </h2>
+                <div className="text-gray-700 text-lg sm:text-xl leading-relaxed pl-4">
+                  {section.content}
+                </div>
+              </div>
+            ))}
+
+            <div className="mt-16 border-t pt-8">
+              <p className="text-gray-600 text-center text-lg">
+                For any questions or concerns regarding this Legal Notice, please
+                contact us at{" "}
+                <a
+                  href="mailto:support@roomieqindia.com"
+                  className="text-blue-600 hover:text-blue-800 underline transition-colors 
+                    duration-300 font-medium"
+                >
+                  support@roomieqindia.com
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
-      <DownloadPromo />
-      <Footer />
+
+      <div className="mt-auto">
+        <DownloadPromo />
+        <Footer />
+      </div>
     </div>
   );
 }

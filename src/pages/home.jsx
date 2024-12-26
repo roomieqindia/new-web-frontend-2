@@ -25,13 +25,30 @@ import Navbar from "../components/Navbar";
 import Overlay from "../components/Overlay";
 import { axiosI } from "../axios";
 
+import { Home, Users, Utensils, Briefcase } from "lucide-react";
+
 function temphome() {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
-  // suggestion state
   const [suggestions, setSuggestions] = useState([]);
+  const [displayLimit, setDisplayLimit] = useState(5); // Add this state
   const { userData } = useAuth();
+  const categories = [
+    { name: "Hostels", icon: Home, href: "/hostels" },
+    { name: "Rooms", icon: Home, href: "/room" },
+    { name: "Roommates", icon: Users, href: "/roommates" },
+    { name: "Bhojanalayas", icon: Utensils, href: "/bhojanalayas" },
+    { name: "Offices", icon: Briefcase, href: "/offices" },
+  ];
+  const cities = [
+    { image: city1 },
+    { image: city2 },
+    { image: city3 },
+    { image: city4 },
+    { image: city5 },
+    { image: city6 },
+  ];
 
   useEffect(() => {
     if (location) {
@@ -92,6 +109,11 @@ function temphome() {
     }
   };
 
+  // Add this function to handle showing more results
+  const handleShowMore = () => {
+    setDisplayLimit(prevLimit => prevLimit + 5);
+  };
+
   return (
     <>
       {!location && <Overlay setLocation={setLocation} location={location} />}
@@ -135,14 +157,14 @@ function temphome() {
                 {!isFetching && suggestions.length > 0 && (
                   <div className="absolute left-0 w-full bg-white border border-gray-200 shadow-lg rounded-b-lg top-full z-10 mt-1 max-h-72 overflow-y-auto">
                     <div className="flex flex-col divide-y divide-gray-200">
-                      {suggestions.map((s, i) => (
+                      {suggestions.slice(0, displayLimit).map((s, i) => (
                         <div
                           key={i}
                           className="flex items-center gap-8 cursor-pointer hover:bg-blue-50 p-4 transition ease-in-out duration-200"
                           onClick={() => handleNavigate(s)}
                         >
                           <img
-                            src={s.images || "/placeholder-image.jpg"}
+                            src={s.images[0] || "/placeholder-image.jpg"}
                             alt={s.name || "Suggestion"}
                             className="w-16 h-16 rounded-md object-cover"
                           />
@@ -162,6 +184,14 @@ function temphome() {
                           </div>
                         </div>
                       ))}
+                      {suggestions.length > displayLimit && (
+                        <button
+                          onClick={handleShowMore}
+                          className="w-full py-3 text-blue-600 hover:text-blue-800 font-medium hover:bg-blue-50 transition duration-200"
+                        >
+                          Show More
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -189,47 +219,76 @@ function temphome() {
 
           {/* Chatbot Floating Button */}
         </div>
-
         {/* Second Division */}
-        <div className="max-w-screen mx-auto w-full bg-[#d0f4de] py-12">
-          {/* Title */}
-          <div className="text-center text-black text-3xl sm:text-[42px] font-semibold font-['Poppins'] pt-[10px] sm:pt-[20px]">
-            Our Categories
-          </div>
-          <div className="gap-4 sm:gap-6 mt-[30px] sm:mt-[60px] flex flex-wrap justify-center items-center px-4">
-            <Link
-              to="/hostels"
-              className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-[#fcf6bd] rounded-full border-b-[6px] border-r-[4px] border-slate-400 shadow-xl flex-shrink-0 flex justify-center items-center text-xs overflow-hidden"
+        {/* <div className="max-w-screen mx-auto w-full bg-[#d0f4de] py-12"> */}
+        {/* {" "} */}
+        {/* Title */}{" "}
+        {/* <div className="text-center text-black text-3xl sm:text-[42px] font-semibold font-['Poppins'] pt-[10px] sm:pt-[20px]"> */}
+        {/* {" "} */}
+        {/* Our Categories{" "} */}
+        {/* </div>{" "} */}
+        {/* <div className="gap-4 sm:gap-6 mt-[30px] sm:mt-[60px] flex flex-wrap justify-center items-center px-4"> */}
+        {/* {" "} */}
+        {/* <Link */}
+        {/* to="/hostels" */}
+        {/* className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-[#fcf6bd] rounded-full border-b-[6px] border-r-[4px] border-slate-400 shadow-xl flex-shrink-0 flex justify-center items-center text-xs overflow-hidden"
             >
-              Hostels
-            </Link>
+              {" "}
+              Hostels{" "}
+            </Link>{" "}
             <Link
               to="/room"
               className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-[#fcf6bd] rounded-full border-b-[6px] border-r-[4px] border-slate-400 shadow-xl flex-shrink-0 flex justify-center items-center text-xs overflow-hidden"
             >
-              Rooms
-            </Link>
+              {" "}
+              Rooms{" "}
+            </Link>{" "}
             <Link
               to="/roommates"
               className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-[#fcf6bd] rounded-full border-b-[6px] border-r-[4px] border-slate-400 shadow-xl flex-shrink-0 flex justify-center items-center text-xs overflow-hidden"
             >
-              Roommates
-            </Link>
+              {" "}
+              Roommates{" "}
+            </Link>{" "}
             <Link
               to="/bhojanalayas"
               className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-[#fcf6bd] rounded-full border-b-[6px] border-r-[4px] border-slate-400 shadow-xl flex-shrink-0 flex justify-center items-center text-xs overflow-hidden"
             >
-              Bhojanalayas
-            </Link>
+              {" "}
+              Bhojanalayas{" "}
+            </Link>{" "}
             <Link
               to="/offices"
               className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-[#fcf6bd] rounded-full border-b-[6px] border-r-[4px] border-slate-400 shadow-xl flex-shrink-0 flex justify-center items-center text-xs overflow-hidden"
             >
-              Offices
-            </Link>
+              {" "}
+              Offices{" "}
+            </Link>{" "}
+          </div>{" "}
+        </div> */}
+        <section className="bg-gradient-to-b from-green-50 to-green-100 py-16 sm:py-24">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-12 sm:mb-16">
+              Our Categories
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-12">
+              {categories.map((category) => (
+                <Link
+                  key={category.name}
+                  to={category.href}
+                  className="group flex flex-col items-center"
+                >
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 bg-white rounded-full shadow-lg flex items-center justify-center transform transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:shadow-xl">
+                    <category.icon className="w-12 h-12 sm:w-16 sm:h-16 text-green-500 group-hover:text-green-600 transition-colors duration-300" />
+                  </div>
+                  <span className="mt-4 text-sm sm:text-base font-medium text-gray-900 group-hover:text-green-600 transition-colors duration-300">
+                    {category.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-
+        </section>
         {/* Third Division */}
         <div className="w-full max-w-screen bg-white gap-6 flex flex-col md:flex-row md:items-center items-center px-6 sm:px-12 lg:px-24 py-10">
           {/* Text Section */}
@@ -262,7 +321,6 @@ function temphome() {
             />
           </div>
         </div>
-
         {/* Fourth Division */}
         <div className="w-full bg-[#d0f4de] flex flex-col gap-6 md:flex-row-reverse items-center py-16 px-6 sm:px-12 lg:px-24">
           <div className="flex-1 text-center md:text-left">
@@ -287,7 +345,6 @@ function temphome() {
             />
           </div>
         </div>
-
         {/* Fifth Division */}
         <div className="w-full bg-white flex flex-col md:flex-row gap-6 items-center py-16 px-6 sm:px-12 lg:px-24">
           <div className="flex-1 text-center md:text-left">
@@ -311,7 +368,6 @@ function temphome() {
             <img className="max-w-full h-auto" src={KoiImg} alt="Placeholder" />
           </div>
         </div>
-
         {/* Sixth Division */}
         <div className="w-full bg-[#D0F4DE] flex flex-col md:flex-row-reverse items-center gap-6 py-16 px-6 sm:px-12 lg:px-24">
           <div className="flex-1 text-center md:text-left">
@@ -336,7 +392,6 @@ function temphome() {
             />
           </div>
         </div>
-
         {/* Seventh Division */}
         <div className="w-full bg-white py-10 flex justify-center">
           <div className="w-full max-w-[1600px] px-4 lg:px-8">
@@ -462,13 +517,37 @@ function temphome() {
               </div>
             </div>
 
+            {/* <section className="w-full py-16 sm:py-24">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12 sm:mb-16">
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    Our Major Locations
+                  </h2>
+                  <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto">
+                    Discover your perfect destination among our carefully
+                    selected cities
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 sm:gap-8 md:gap-10">
+                  {cities.map((city) => (
+                    <CityItem image={city.image} />
+                  ))}
+                </div>
+
+                <div className="mt-12 sm:mt-16 text-center">
+                  <button className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50">
+                    Explore All Locations
+                  </button>
+                </div>
+              </div>
+            </section> */}
+
             {/* Button Section */}
           </div>
         </div>
-
         {/* Eighth Division  */}
         <DownloadPromo />
-
         {/* Nineth Division  */}
         <div className="w-full bg-[#d0f4de] flex flex-col md:flex-row items-center py-16 px-6 sm:px-12 lg:px-24">
           <div className="flex-1 text-center md:text-left">
@@ -492,7 +571,6 @@ function temphome() {
             />
           </div>
         </div>
-
         {/* Last Division  */}
         <Footer />
       </div>

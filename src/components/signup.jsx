@@ -37,12 +37,14 @@ const SignupForm = () => {
             },
           }
         );
-        const { name, email } = res.data;
-        setUser({ name, email });
+        console.log(res.data);
+        
+        const { name, email, picture } = res.data;
 
         const { data } = await axiosI.post("/google-login", {
           name,
           email,
+          picture
         });
 
         if (data.success) {
@@ -54,6 +56,8 @@ const SignupForm = () => {
 
           // Navigate to the home page
           location.reload();
+        } else {
+          console.error("Error:", data.message || "An error occurred");
         }
       } catch (err) {
         console.log(err);

@@ -80,6 +80,9 @@ function ProductCard({
                   />
                 </button>
                 {verified && <CheckCircle className="w-6 h-6 text-blue-500 " />}
+                {/* <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-medium">
+                      Verified
+                    </span> */}
               </div>
             </div>
 

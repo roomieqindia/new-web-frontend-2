@@ -11,6 +11,7 @@ import { axiosI } from "../axios";
 import { useLocationContext } from "../../utils/LocationContext";
 import Overlay from "../components/Overlay";
 import ProductCard from "./Demo";
+import { set } from "react-hook-form";
 
 function RoomsPage() {
   const { userLocation, fetchLocation } = useLocationContext();
@@ -38,6 +39,7 @@ function RoomsPage() {
   });
   const [location, setLocation] = useState(localStorage.getItem("location"));
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [visibleItems, setVisibleItems] = useState(8);
 
   useEffect(() => {
     if (location) {
@@ -108,10 +110,11 @@ function RoomsPage() {
 
   const handleFilter = async () => {
     // Filter rooms with advanceFilter
-    setLoading(true);
+    // setLoading(true);
+    setVisibleItems(8);
     const { data } = await axiosI.post("/filter/rooms", advanceFilter);
     setRoomList(data);
-    setLoading(false);
+    // setLoading(false);
   };
 
   const handleClearFilter = () => {
@@ -147,7 +150,12 @@ function RoomsPage() {
   };
 
   const handleToggleFilter = () => {
+    setVisibleItems(8);
     setIsFilterVisible(!isFilterVisible);
+  };
+
+  const loadMore = () => {
+    setVisibleItems(prev => prev + 8);
   };
 
   return (
@@ -155,7 +163,7 @@ function RoomsPage() {
       <Navbar isFilterVisible={isFilterVisible} />
       {!location && <Overlay setLocation={setLocation} location={location} />}
       {/* if isFilterVisible is true blur the main div */}
-      <div className={`mb-[20px] ${isFilterVisible && "blur-sm"}`}>
+      <div className={`mb-[20px] ${isFilterVisible ? "blur-sm" : ""}`}>
         <div className="relative bg-white overflow-hidden h-auto pt-8">
           {/* Background Houses */}
           <img
@@ -204,14 +212,14 @@ function RoomsPage() {
             <p className="text-sm sm:text-lg font-poppins text-gray-600">
               Home \ Rooms
             </p>
-            <div className="flex items-center bg-white gap-4 justify-between px-3 pt-8 max-xs:w-full ">
+            <div className="flex items-center bg-white gap-4 justify-between px-3 pt-8 max-xs:w-full cursor-pointer">
               <span
                 onClick={() => {
                   localStorage.removeItem("location");
                   setLocation(null);
                 }}
               >
-                {location.length > 20
+                {location && location.length > 20
                   ? location?.slice(0, 25) + "..."
                   : location}
               </span>
@@ -492,23 +500,35 @@ function RoomsPage() {
               <div className={isFilterVisible ? "blur-sm" : ""}>
                 <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {roomList.length > 0 ? (
-                    roomList.map((room, index) => (
-                      <div key={index}>
-                        <ProductCard
-                          title={room.roomName}
-                          desc={room.description || "No Description"}
-                          img={room.images?.[0]} // Safe navigation for images array
-                          price={room.monthlyMaintenance}
-                          location={room.location}
-                          link={`/room/${room._id}`}
-                          verified={room.uid?.verified || false}
-                          isFeatureListing={room.uid?.isFeatureListing}
-                          isWishlisted={wishlist.includes(room._id)}
-                          toggleWishlist={() => toggleWishlist(room._id)}
-                          distance={room.distance}
-                        />
-                      </div>
-                    ))
+                    <>
+                      {roomList.slice(0, visibleItems).map((room, index) => (
+                        <div key={index}>
+                          <ProductCard
+                            title={room.roomName}
+                            desc={room.description || "No Description"}
+                            img={room.images?.[0]} // Safe navigation for images array
+                            price={room.monthlyMaintenance}
+                            location={room.location}
+                            link={`/room/${room._id}`}
+                            verified={room.uid?.verified || false}
+                            isFeatureListing={room.uid?.isFeatureListing}
+                            isWishlisted={wishlist.includes(room._id)}
+                            toggleWishlist={() => toggleWishlist(room._id)}
+                            distance={room.distance}
+                          />
+                        </div>
+                      ))}
+                      {visibleItems < roomList.length && (
+                        <div className="col-span-full flex justify-center mt-4">
+                          <button
+                            onClick={loadMore}
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                          >
+                            Show More
+                          </button>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="text-center text-2xl font-bold">
                       No Rooms Found
@@ -524,7 +544,7 @@ function RoomsPage() {
       {/* Eighth Division  */}
       <div
         className={`bg-[#f8f8f8] flex flex-col items-center justify-center py-12 px-4 sm:px-8 lg:flex-row lg:py-16 ${
-          isFilterVisible && "blur-sm"
+          isFilterVisible ? "blur-sm" : ""
         }`}
       >
         {/* Left Section: Text Content */}
@@ -566,7 +586,7 @@ function RoomsPage() {
           />
         </div>
       </div>
-      <div className={isFilterVisible && "blur-sm"}>
+      <div className={isFilterVisible ? "blur-sm" : ""}>
         <Footer />
       </div>
     </>

@@ -100,7 +100,7 @@ const GridComponent = () => {
                   occupation={details?.occupation || "Not specified"}
                   location={details?.location || "Location not specified"}
                   link={`/${details.type}/${itemId}`} // Example link, adjust according to your routing
-                  img={details?.images || "/default-image?.jpg"} // Placeholder image
+                  img={details?.images[0] || "/default-image?.jpg"} // Placeholder image
                   verified={details?.uid?.verified || false}
                   isFeatureListing={details?.uid?.isFeatureListing || false}
                   isWishlisted={wishlist?.includes(itemId)}
