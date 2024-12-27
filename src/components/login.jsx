@@ -59,7 +59,7 @@ const Login = ({ setLoginVisible }) => {
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      setError("An error occurred. Please try again later.");
+      setError(error.response.data.message || "An error occurred");
     }
   };
   const login = useGoogleLogin({
@@ -74,13 +74,13 @@ const Login = ({ setLoginVisible }) => {
           }
         );
         console.log(res.data);
-        
+
         const { name, email, picture } = res.data;
 
         const { data } = await axiosI.post("/google-login", {
           name,
           email,
-          picture
+          picture,
         });
 
         if (data.success) {

@@ -10,6 +10,8 @@ import { axiosI } from "../axios";
 const SignupForm = () => {
   const navigate = useNavigate();
   const [isSending, setIsSending] = useState(false);
+  const [disabled, setdisabled] = useState(false);
+
   useEffect(() => {
     if (localStorage.getItem("isLoggedIn")) {
       navigate("/");
@@ -38,13 +40,13 @@ const SignupForm = () => {
           }
         );
         console.log(res.data);
-        
+
         const { name, email, picture } = res.data;
 
         const { data } = await axiosI.post("/google-login", {
           name,
           email,
-          picture
+          picture,
         });
 
         if (data.success) {
@@ -116,14 +118,19 @@ const SignupForm = () => {
         navigate("/otp1", { state: formData, forgot: false });
       } else {
         toast.error(data.message || "Failed to send OTP");
+        setdisabled(true);
       }
     } catch (error) {
       console.error("Error sending OTP:", error);
 
       // Show error message from backend in a toast
-      toast.error(`Error: ${error.message || "Something went wrong"}`);
+      toast.error(error.response.data.message || "Something went wrong");
+      setdisabled(true);
     } finally {
       setIsSending(false);
+      setTimeout(() => {
+        setdisabled(false);
+      }, 1000);
     }
   };
   return (
@@ -219,12 +226,14 @@ const SignupForm = () => {
             {/* Buttons */}
             <button
               type="submit"
-              disabled={isSending} // Disable the button if OTP is being sent
-              className={`w-full py-2 bg-[#E4C1F9] text-purple-700 rounded-lg transition-colors text-sm font-medium relative top-4 h-10 ${
-                isSending
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Style for disabled state
-                  : "hover:bg-purple-300"
-              }`}
+              disabled={isSending || disabled}
+              className={`w-full py-2 bg-[#E4C1F9] text-purple-700 rounded-lg transition-colors text-sm font-medium relative top-4 h-10
+                ${disabled && "cursor-not-allowed"}
+                ${
+                  isSending
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Style for disabled state
+                    : "hover:bg-purple-300"
+                }`}
             >
               {isSending ? "Sending..." : "Send OTP"}
             </button>

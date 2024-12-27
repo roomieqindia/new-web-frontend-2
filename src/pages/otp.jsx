@@ -66,9 +66,9 @@ const OTP1 = () => {
       if (data.success) {
         toast.success("A new OTP has been sent to your email!");
         document.querySelector("input").focus(); // Focus on the first input field
+      } else {
+        toast.error(data.message || "Failed to resend OTP. Please try again.");
       }
-
-      toast.error(data.message || "Failed to resend OTP. Please try again.");
     } catch (error) {
       console.error("Error resending OTP:", error);
       toast.error(
@@ -93,7 +93,7 @@ const OTP1 = () => {
         otpRefs.current[0].focus(); // Focus on the first OTP input field
       }
     } catch (error) {
-      toast.error("Internal server error. Please try again later.");
+      toast.error(error.response.data.message);
     }
   };
 

@@ -209,8 +209,8 @@ function RoommatesPage() {
           <div className="font-poppins py-6 flex gap-2">
             {/* Filter Panel */}
             <div
-              className={`fixed inset-x-0 bottom-0 z-50 w-full h-[80vh] bg-white shadow-lg transform ${
-                isFilterVisible ? "translate-y-0" : "translate-y-full"
+              className={`fixed inset-x-0 bottom-0 z-50 w-full h-[75vh] bg-white shadow-lg transform ${
+                isFilterVisible ? "translate-y-0 z-[101]" : "translate-y-full"
               } transition-transform duration-300 ease-in-out sm:relative sm:translate-y-0 sm:w-1/5 sm:h-auto sm:shadow-none flex flex-col sm:mx-6 border-t-[.5px] sm:border-[.5px] p-4 sm:rounded-lg border-gray-900 overflow-y-auto`}
             >
               <button

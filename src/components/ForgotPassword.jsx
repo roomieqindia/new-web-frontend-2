@@ -8,6 +8,7 @@ import { axiosI } from "../axios";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [loader, setloader] = useState(false);
+  const [disabled, setdisabled] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -28,13 +29,20 @@ const ForgotPassword = () => {
         toast.success(data.message);
         navigate("/otp1", { state: { email, forgot: true } });
       } else {
-        toast.error(data.message || "Failed to send OTP");
+        setdisabled(true);
+        toast.error(error.response.data.message || "Failed to send OTP");
       }
     } catch (error) {
       console.error("Error sending OTP:", error);
-      toast.error(error.message || "An error occurred. Please try again.");
+      setdisabled(true);
+      toast.error(
+        error.response.data.message || "An error occurred. Please try again."
+      );
     } finally {
       setloader(false);
+      setTimeout(() => {
+        setdisabled(false);
+      }, 1000);
     }
   };
 
@@ -82,7 +90,10 @@ const ForgotPassword = () => {
             ) : (
               <button
                 type="submit"
-                className="w-full py-2 bg-[#E4C1F9] text-purple-700 rounded-lg hover:bg-purple-300 transition-colors text-sm font-medium relative top-4 h-10"
+                className={`w-full py-2 bg-[#E4C1F9] text-purple-700 rounded-lg hover:bg-purple-300 transition-colors text-sm font-medium relative top-4 h-10
+                  ${disabled && "cursor-not-allowed"}
+                  `}
+                disabled={disabled}
               >
                 Send Reset OTP
               </button>

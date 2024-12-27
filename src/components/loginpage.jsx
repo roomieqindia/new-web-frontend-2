@@ -5,7 +5,6 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify"; // Import the toast library
 import "react-toastify/dist/ReactToastify.css"; // Import styles
 
-
 import axios from "axios";
 import { axiosI } from "../axios";
 
@@ -47,13 +46,13 @@ const LoginForm = () => {
           }
         );
         console.log(res.data);
-        
+
         const { name, email, picture } = res.data;
 
         const { data } = await axiosI.post("/google-login", {
           name,
           email,
-          picture
+          picture,
         });
 
         if (data.success) {
@@ -104,30 +103,26 @@ const LoginForm = () => {
     // Validate form
     if (!validateForm()) return;
 
-    setLoading(true); // Disable button while processing
+    setLoading(true);
 
     try {
       const { data } = await axiosI.post("/login", formData);
       console.log(data);
 
       if (!data.success) {
-        // Display error message from the backend
         toast.error(data.message || "Login failed");
         setErrors({ sub: data.message });
         setLoading(false); // Re-enable button
         return;
       }
 
-      // Display success message
       toast.success(data.message || "Login successful!");
 
-      // Save login state and user data
       localStorage.setItem("isLoggedIn", "true");
       if (data.user?.uid) {
         localStorage.setItem("user", data.user.uid);
       }
 
-      // Navigate to the home page
       setTimeout(() => {
         navigate("/", { state: { email: formData.email } });
       }, 1000);
