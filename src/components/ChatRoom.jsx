@@ -4,7 +4,10 @@ import io from "socket.io-client";
 import moment from "moment";
 import { axiosI } from "../axios";
 
-const socket = io(import.meta.env.VITE_URL);
+const socket = io(import.meta.env.VITE_URL, {
+  withCredentials: true,
+  transports: ['websocket'], // Ensure WebSocket transport is enabled
+});
 
 const ChatRoom = () => {
   const { roomId } = useParams();
