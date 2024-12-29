@@ -214,8 +214,8 @@ function RoomLisitngForm() {
       <div className="relative flex flex-col items-center justify-center pt-[100px] md:pt-[200px] pb-8 h-auto text-center z-10">
         <h1 className="text-xl md:text-[40px] font-bold mb-2 text-gray-600">
           {state?.update
-            ? "Update your Flat/Room details"
-            : "Add your Flat/Room details"}
+            ? "Update your your details"
+            : "Add your Your details"}
         </h1>
         <p className="text-md md:text-2xl text-gray-600">
           {state?.update
@@ -233,7 +233,7 @@ function RoomLisitngForm() {
               <input
                 {...register("roomName")}
                 type="text"
-                placeholder="Enter Flat/Room name"
+                placeholder="Enter Your name"
                 className="w-full p-4 h-19 bg-white border border-gray-300 rounded-[20px] outline-none font-light text-[18px] md:text-[25px] text-gray-600"
               />
               {errors.roomName && (
