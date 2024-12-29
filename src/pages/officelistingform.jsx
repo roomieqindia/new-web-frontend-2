@@ -228,12 +228,12 @@ function HostelLisitngForm() {
           <div className="space-y-6 w-full  md:w-[1000px] max-w-lg">
             <div>
               <p className="text-gray-600 font-semibold mb-2 text-[18px] md:text-[25px] font-poppins">
-                Office Name
+                Title
               </p>
               <input
                 {...register("officeName")}
                 type="text"
-                placeholder="Enter office name"
+                placeholder="Enter Title"
                 className="w-full p-4 h-19 bg-white border border-gray-300 rounded-[20px] outline-none font-light text-[18px] md:text-[25px] text-gray-600"
               />
               {errors.officeName && (
@@ -271,9 +271,9 @@ function HostelLisitngForm() {
               )}
             </div>
 
-            <div>
+            {/* <div>
               <p className="text-gray-600 font-semibold mb-2 text-[18px] md:text-[25px] font-poppins">
-                Add Title
+                Add Sub-Title
               </p>
               <input
                 {...register("title")}
@@ -286,12 +286,13 @@ function HostelLisitngForm() {
                   {errors.title.message}
                 </p>
               )}
-            </div>
+            </div> */}
 
             <div className="relative">
-              <p className="text-gray-600 font-semibold mb-2 text-[20px] md:text-[25px] font-poppins">
-                Monthly Maintenance
-              </p>
+              <div className="text-gray-600 font-semibold mb-2 text-[20px] md:text-[25px] font-poppins flex items-center">
+              Total rent &nbsp;
+              <div className="opacity-80 md:text-[15px]">(add maintenance if any)</div>
+              </div>
               <div className="absolute inset-y-0 top-[40px] md:top-[48px] left-3 flex items-center pointer-events-none">
                 <svg
                   width="24px"
@@ -313,7 +314,7 @@ function HostelLisitngForm() {
               <input
                 type="text"
                 {...register("monthlyMaintenance")}
-                placeholder="00, 500, 800, 1000......."
+                placeholder="Enter any amount"
                 className="w-full p-4 pl-10 h-19 border border-gray-300 rounded-[20px] outline-none font-light text-[18px] md:text-[25px] text-gray-600"
               />
             </div>
